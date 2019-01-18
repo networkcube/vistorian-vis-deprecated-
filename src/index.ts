@@ -1,0 +1,16 @@
+/// <reference path="../../vistorian-core/lib/index.d.ts" />
+
+export import utils = require("utils")
+export import queries = require("queries")
+export import datamanager = require("datamanager")
+export import dynamicgraph = require("dynamicgraph")
+export import setOps = require("lib/setOps")
+export import netClustering = require("lib/netClustering")
+export import motifs = require("motifs")
+export import analytics = require("analytics")
+export import main = require("main")
+export import colors = require("colors")
+export import search = require("search")
+export import messenger = require("messenger")
+export import science = require("lib/science")
+export import ordering = require("ordering")
