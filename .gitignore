@@ -4,3 +4,4 @@ debug/*
 node_modules
 src/visualizations
 src/web
+package-lock.json
