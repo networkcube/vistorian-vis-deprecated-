@@ -166,7 +166,7 @@ class CellLabel {
     this.cellLabel.attr('z', -1)
       .style('opacity', 0);
   }
-  updateCellLabel(mx: number, my: number, val: number, fw: number) {
+  updateCellLabel(mx: number, my: number, val: number | null, fw: number) {
 
     this.cellLabel
       .attr('x', mx + 40)
@@ -247,7 +247,7 @@ class MatrixOverview {
       .attr("fill", this.focusColor)
       .attr("fill-opacity", .2);
 
-    this.zoom = d3.behavior.zoom()
+    this.zoom = d3.zoom()
       // .scaleExtent([0.2, 4])
       .on('zoom', this.zoomed);
 
@@ -452,7 +452,7 @@ class MatrixVisualization {
   private renderer: three.WebGLRenderer = new three.WebGLRenderer();
   private geometry: three.BufferGeometry = new three.BufferGeometry();
   private mesh: three.Mesh = new three.Mesh();
-  private guideLines: three.LineBasicMaterial[];
+  private guideLines: three.Object3D[];
   private vertexPositions: number[][] = [];
   private vertexColors: number[][] = [];
   private shaderMaterial: three.ShaderMaterial = new three.ShaderMaterial();
@@ -479,8 +479,8 @@ class MatrixVisualization {
     this.hoveredLinks = [];
     this.previousHoveredLinks = [];
     this.mouseDownCell = { row: 0, col: 0 };
-    this.cellHighlightFrames = networkcube.array(undefined, matrix.numberOfLinks());
-    this.cellSelectionFrames = networkcube.array(undefined, matrix.numberOfLinks());
+    this.cellHighlightFrames = utils.array(undefined, matrix.numberOfLinks());
+    this.cellSelectionFrames = utils.array(undefined, matrix.numberOfLinks());
     this.linkWeightScale = d3.scaleLinear().range([0.1, 1])
       .domain([0, matrix.maxWeight()]);
     this.init();
@@ -489,7 +489,7 @@ class MatrixVisualization {
     this.initWebGL();
     this.elem.node().appendChild(this.canvas);
     this.view = d3.select(this.canvas);
-    this.zoom = d3.behavior.zoom()
+    this.zoom = d3.zoom()
       //.scaleExtent([0.2, 4])
       .on('zoom', this.zoomed);
     this.view.call(this.zoom);
@@ -614,11 +614,12 @@ class MatrixVisualization {
     if (this.geometry) {
       this.scene.remove(this.mesh);
     }
-    for (let id of this.hoveredLinks) {
-      if (this.cellHighlightFrames[id])
-        for (let frame of this.cellHighlightFrames[id])
-          this.scene.remove(frame);
-    }
+    if (this.hoveredLinks)
+      for (let id of this.hoveredLinks) {
+        if (this.cellHighlightFrames[id])
+          for (let frame of this.cellHighlightFrames[id])
+            this.scene.remove(frame);
+      }
     for (let i = 0; i < this.guideLines.length; i++) {
       this.scene.remove(this.guideLines[i]);
     }
@@ -1073,12 +1074,12 @@ class Matrix {
         this.nodeOrder[nodes2[i].id()] = i;
       }
     } else if (orderType == 'similarity') {
-      let config: ordering.OrderingConfiguration = new ordering.OrderingConfiguration();
-      config.start = this.startTime;
-      config.end = this.endTime;
+      let config: ordering.OrderingConfiguration = new ordering.OrderingConfiguration(this.startTime, this.endTime);
+      // config.start = this.startTime;
+      // config.end = this.endTime;
       config.nodes = this._dgraph.nodes().visible().toArray();
       config.links = this._dgraph.links().presentIn(this.startTime, this.endTime).visible().toArray();
-      this.nodeOrder = networkcube.orderNodes(this._dgraph, config);
+      this.nodeOrder = ordering.orderNodes(this._dgraph, config);
     } else {
       let visibleNodes = this._dgraph.nodes().visible().toArray();
       this.nodeOrder = [];
@@ -1178,7 +1179,7 @@ class Matrix {
   }
   highlightLinks(highlightedIds: number[]) {
     if (highlightedIds.length > 0) {
-      let highlightedLinks: queries.Link[] = highlightedIds.map(
+      let highlightedLinks: (queries.Link | undefined)[] = highlightedIds.map(
         (d) => this._dgraph.link(d));
       messenger.highlight('set', <utils.ElementCompound>{ links: highlightedLinks });
     } else
@@ -1189,16 +1190,16 @@ class Matrix {
     let currentSelection = this._dgraph.getCurrentSelection();
     for (let j = 0; j < selections.length; j++) {
       if (selections[j] == currentSelection) {
-        networkcube.selection('remove', <utils.ElementCompound>{ nodes: [d] });
+        messenger.selection('remove', <utils.ElementCompound>{ nodes: [d] });
         return;
       }
     }
-    networkcube.selection('add', <utils.ElementCompound>{ nodes: [d] });
+    messenger.selection('add', <utils.ElementCompound>{ nodes: [d] });
     this.labels.updateHighlightedNodes();
   }
   highlightNodes(highlightedIds: number[]) {
     if (highlightedIds.length > 0) {
-      let highlightedNodes: queries.Node[] = highlightedIds.map(
+      let highlightedNodes: (queries.Node | undefined)[] = highlightedIds.map(
         (d) => this._dgraph.node(d));
       messenger.highlight('set', <utils.ElementCompound>{ nodes: highlightedNodes });
     } else
@@ -1210,11 +1211,13 @@ class Matrix {
       return;
     }
     let link = this._dgraph.link(linkId);
-    let val = link.weights(this.startTime, this.endTime).get(0);
-    val = Math.round(val * 1000) / 1000;
-    let z = this._scale;
-    let fw = this.initialCellSize;
-    this.cellLabel.updateCellLabel(mx, my, val, fw);
+    if (link) {
+      let val = link.weights(this.startTime, this.endTime).get(0);
+      val = Math.round(val * 1000) / 1000;
+      let z = this._scale;
+      let fw = this.initialCellSize;
+      this.cellLabel.updateCellLabel(mx, my, val, fw);
+    }
 
   }
   updateEvent = () => {
