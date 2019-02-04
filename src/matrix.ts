@@ -1,28 +1,14 @@
-// <reference path="../../core/scripts/three.d.ts"/>
-// <reference path="../../core/helper/glutils.ts"/>
-// <reference path="../../core/networkcube.d.ts" />
-// <reference path="../../core/scripts/jquery.d.ts"/>
-// <reference path="../../core/scripts/d3.d.ts"/>
-// <reference path="../widgets/widgets.d.ts" />
-
-// import * as science from 'science';
-
-import * as three from 'three';
+import * as THREE from 'three';
 import * as d3 from 'd3';
-import {
-  dynamicgraph,
-  utils,
-  queries,
-  main,
-  messenger,
-  ordering
-} from './vistorian-core-imports';
 
-import {
-  makeSlider,
-  TimeSlider,
-  glutils
-} from './vistorian-widgets-imports';
+import * as dynamicgraph from 'vistorian-core/src/dynamicgraph';
+import * as utils from 'vistorian-core/src/utils';
+import * as main from 'vistorian-core/src/main';
+import * as messenger from 'vistorian-core/src/messenger';
+import * as ordering from 'vistorian-core/src/ordering';
+
+import * as TimeSlider from 'vistorian-widgets/src/timeslider';
+import * as glutils from 'vistorian-widgets/src/glutils';
 
 const COLOR_HIGHLIGHT = 0x000000;
 const COLOR_SELECTION = 0xff0000;
@@ -321,7 +307,7 @@ class MatrixLabels {
     this.cellSize = 0;
   }
 
-  updateData(leftNodes: queries.Node[], topNodes: queries.Node[],
+  updateData(leftNodes: dynamicgraph.Node[], topNodes: dynamicgraph.Node[],
     cellSize: number, nodeOrder: number[],
     leftLabelOffset: number, topLabelOffset: number,
     bbox: Box) {
@@ -444,25 +430,25 @@ class MatrixVisualization {
   private toHoverLinks: number[] = [];
   private hoveredLinks: number[] | undefined;
   private previousHoveredLinks: number[] | undefined;
-  private canvas: HTMLCanvasElement = new HTMLCanvasElement();
+  private canvas: any; // HTMLCanvasElement = new HTMLCanvasElement();
   private view: any; // BEFORE D3.Selection;
   private zoom: any; // BEFORE D3.Behavior.Zoom;
-  private scene: three.Scene = new three.Scene();
-  private camera: any; // BEFORE three.OrthographicCamera;
-  private renderer: three.WebGLRenderer = new three.WebGLRenderer();
-  private geometry: three.BufferGeometry = new three.BufferGeometry();
-  private mesh: three.Mesh = new three.Mesh();
-  private guideLines: three.Object3D[];
+  private scene: any; // BEFORE THREE.Scene = new THREE.Scene();
+  private camera: any; // BEFORE THREE.OrthographicCamera;
+  private renderer: any; // BEFORE THREE.WebGLRenderer = new THREE.WebGLRenderer();
+  private geometry: THREE.BufferGeometry = new THREE.BufferGeometry();
+  private mesh: THREE.Mesh = new THREE.Mesh();
+  private guideLines: THREE.Object3D[];
   private vertexPositions: number[][] = [];
   private vertexColors: number[][] = [];
-  private shaderMaterial: three.ShaderMaterial = new three.ShaderMaterial();
-  private cellHighlightFrames: { [id: number]: three.Mesh[] };
-  private cellSelectionFrames: three.Mesh[];
+  private shaderMaterial: THREE.ShaderMaterial = new THREE.ShaderMaterial();
+  private cellHighlightFrames: { [id: number]: THREE.Mesh[] };
+  private cellSelectionFrames: THREE.Mesh[];
   private linkWeightScale: any; // BEFORE d3.ScaleLinear;
-  private bufferTexture: any; // BEFORE three.WebGLRenderTarget;
+  private bufferTexture: any; // BEFORE THREE.WebGLRenderTarget;
 
 
-  private data: { [id: number]: { [id: number]: queries.NodePair } } = {};
+  private data: { [id: number]: { [id: number]: dynamicgraph.NodePair } } = {};
   constructor(elem: any, // BEFORE d3.Selection
     width: number, height: number,
     matrix: Matrix) {
@@ -479,8 +465,8 @@ class MatrixVisualization {
     this.hoveredLinks = [];
     this.previousHoveredLinks = [];
     this.mouseDownCell = { row: 0, col: 0 };
-    this.cellHighlightFrames = utils.array(undefined, matrix.numberOfLinks());
-    this.cellSelectionFrames = utils.array(undefined, matrix.numberOfLinks());
+    this.cellHighlightFrames = dynamicgraph.array(undefined, matrix.numberOfLinks());
+    this.cellSelectionFrames = dynamicgraph.array(undefined, matrix.numberOfLinks());
     this.linkWeightScale = d3.scaleLinear().range([0.1, 1])
       .domain([0, matrix.maxWeight()]);
     this.init();
@@ -497,7 +483,7 @@ class MatrixVisualization {
     this.cellSize = this.matrix.cellSize;
 
   }
-  webgl: glutils.WebGL = new glutils.WebGL();
+  webgl: any; //glutils.WebGL = new glutils.WebGL();
   initWebGL() {
     this.webgl = glutils.initWebGL('visCanvasFO', this.width, this.height);
     this.webgl.enablePanning(false);
@@ -506,6 +492,7 @@ class MatrixVisualization {
     this.webgl.camera.position.z = 1000;
 
     this.canvas = this.webgl.canvas;
+
     this.scene = this.webgl.scene;
     this.camera = this.webgl.camera;
     this.renderer = this.webgl.renderer;
@@ -519,9 +506,9 @@ class MatrixVisualization {
     this.webgl.canvas.addEventListener('click', this.clickHandler);
 
 
-    // this.scene = new three.Scene();
+    // this.scene = new THREE.Scene();
     // // camera
-    // // this.camera = new three.OrthographicCamera(
+    // // this.camera = new THREE.OrthographicCamera(
     // //   this.width / -2,
     // //   this.width / 2,
     // //   this.height/ 2,
@@ -533,7 +520,7 @@ class MatrixVisualization {
     // this.camera.position.z = 100;
 
     // // renderer
-    // this.renderer = new three.WebGLRenderer({ antialias: true })
+    // this.renderer = new THREE.WebGLRenderer({ antialias: true })
     // this.renderer.setSize(this.width, this.height);
     // this.renderer.setClearColor(0xffffff, 1);
 
@@ -553,7 +540,7 @@ class MatrixVisualization {
   }
 
   initTextureFramebuffer() {
-    this.bufferTexture = new three.WebGLRenderTarget(256, 256, { minFilter: three.NearestMipMapNearestFilter, magFilter: three.LinearFilter });
+    this.bufferTexture = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
   }
 
   initGeometry() {
@@ -575,17 +562,17 @@ class MatrixVisualization {
     }
 
     // SHADERS
-    this.shaderMaterial = new three.ShaderMaterial({
+    this.shaderMaterial = new THREE.ShaderMaterial({
       //attributes: attributes, // Not Exist
       vertexShader: vertexShaderProgram,
       fragmentShader: fragmentShaderProgram,
     });
-    this.shaderMaterial.blending = three.NormalBlending;
+    this.shaderMaterial.blending = THREE.NormalBlending;
     this.shaderMaterial.depthTest = true;
     this.shaderMaterial.transparent = true;
-    this.shaderMaterial.side = three.DoubleSide;
+    this.shaderMaterial.side = THREE.DoubleSide;
 
-    this.geometry = new three.BufferGeometry();
+    this.geometry = new THREE.BufferGeometry();
   }
   render() {
     let d = new Date();
@@ -595,7 +582,7 @@ class MatrixVisualization {
     // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
   }
 
-  updateData(data: { [id: number]: { [id: number]: queries.NodePair } },
+  updateData(data: { [id: number]: { [id: number]: dynamicgraph.NodePair } },
     nrows: number, ncols: number,
     cellSize: number,
     offset: number[],
@@ -608,6 +595,10 @@ class MatrixVisualization {
     this.ncols = ncols;
     this.offset = offset;
     this.cellSize = cellSize;
+
+    /* VERRR */
+    console.log(this.zoom);
+    console.log(typeof this.zoom);
     this.zoom.scale(scale);
     this.zoom.translate(tr);
 
@@ -631,19 +622,21 @@ class MatrixVisualization {
     this.cellHighlightFrames = [];
     this.linksPos = {};
 
-    for (let row in this.data) {
-      for (let col in data[row]) {
+    let row: any;
+    for (row in this.data) {
+      let col: any;
+      for (col in data[row]) {
         this.addCell(row, col, data[row][col]);
       }
     }
 
     // CREATE + ADD MESH
-    this.geometry.addAttribute('position', new three.BufferAttribute(glutils.makeBuffer3f(this.vertexPositions), 3));
-    this.geometry.addAttribute('customColor', new three.BufferAttribute(glutils.makeBuffer4f(this.vertexColors), 4));
+    this.geometry.addAttribute('position', new THREE.BufferAttribute(glutils.makeBuffer3f(this.vertexPositions), 3));
+    this.geometry.addAttribute('customColor', new THREE.BufferAttribute(glutils.makeBuffer4f(this.vertexColors), 4));
 
-    this.mesh = new three.Mesh(this.geometry, this.shaderMaterial);
+    this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
 
-    (this.geometry.attributes['customColor'] as three.BufferAttribute).needsUpdate = true;
+    (this.geometry.attributes['customColor'] as THREE.BufferAttribute).needsUpdate = true;
 
     this.scene.add(this.mesh);
     this.render();
@@ -704,15 +697,15 @@ class MatrixVisualization {
     this.renderer.setSize(width, height);
   }
 
-  addCell(row: number, col: number, pair: queries.NodePair) {
-    let links: queries.Link[];
-    let e: queries.Link;
+  addCell(row: number, col: number, pair: dynamicgraph.NodePair) {
+    let links: dynamicgraph.Link[];
+    let e: dynamicgraph.Link;
     let x, y, z: number;
     let linkNum: number;
     let seg: number;
     let meanWeight: number;
     let alpha: number;
-    let color: three.Color;
+    let color: THREE.Color;
 
     links = pair.links().toArray();
     linkNum = links.length;
@@ -726,7 +719,7 @@ class MatrixVisualization {
       if (!webColor)
         webColor = '#000000';
       meanWeight = e.weights() ? e.weights(this.matrix.startTime, this.matrix.endTime).mean() : 1;
-      color = new three.Color(webColor);
+      color = new THREE.Color(webColor);
       alpha = this.linkWeightScale(Math.abs(meanWeight));
       if (!e.isVisible())
         alpha = 0;
@@ -749,9 +742,9 @@ class MatrixVisualization {
   paintCell(id: number, x: number, y: number, w: number,
     color: number[], positive: Boolean) {
     let h: number = this.cellSize;
-    let highlightFrames: three.Mesh = new three.Mesh();
-    let selectionFrames: three.Mesh = new three.Mesh();
-    let frame: three.Line;
+    let highlightFrames: THREE.Mesh = new THREE.Mesh();
+    let selectionFrames: THREE.Mesh = new THREE.Mesh();
+    let frame: any; // BEFORE THREE.Line;
 
     if (positive) {
       glutils.addBufferedRect(this.vertexPositions, x, -y, 0, w - 1, h - 1,
@@ -787,23 +780,23 @@ class MatrixVisualization {
     let w = this.ncols * this.cellSize;
     let h = this.nrows * this.cellSize;
 
-    let geometry1 = new three.Geometry();
+    let geometry1 = new THREE.Geometry();
     geometry1.vertices.push(
-      new three.Vector3(this.offset[0], 0, 0),
-      new three.Vector3(w + this.offset[0], 0, 0)
+      new THREE.Vector3(this.offset[0], 0, 0),
+      new THREE.Vector3(w + this.offset[0], 0, 0)
     )
-    let geometry2 = new three.Geometry();
+    let geometry2 = new THREE.Geometry();
     geometry2.vertices.push(
-      new three.Vector3(0, -this.offset[1], 0),
-      new three.Vector3(0, -h - this.offset[1], 0)
+      new THREE.Vector3(0, -this.offset[1], 0),
+      new THREE.Vector3(0, -h - this.offset[1], 0)
     )
     let m, pos;
-    let mat = new three.LineBasicMaterial({ color: 0xeeeeee, linewidth: 1 });
+    let mat = new THREE.LineBasicMaterial({ color: 0xeeeeee, linewidth: 1 });
     let x, y;
     let j = 0;
     for (let i = 0; i <= h; i += this.cellSize) {
       pos = j * this.cellSize + this.offset[1];
-      m = new three.Line(geometry1, mat)
+      m = new THREE.Line(geometry1, mat)
       m.position.set(0, -pos, 0);
       this.scene.add(m);
       this.guideLines.push(m);
@@ -812,7 +805,7 @@ class MatrixVisualization {
     j = 0;
     for (let i = 0; i <= w; i += this.cellSize) {
       pos = j * this.cellSize + this.offset[0];
-      m = new three.Line(geometry2, mat);
+      m = new THREE.Line(geometry2, mat);
       m.position.set(pos, 0, 0);
       this.scene.add(m);
       this.guideLines.push(m);
@@ -934,14 +927,14 @@ class Matrix {
 
   private visualization: any; // BEFORE MatrixVisualization;
   private labels: any; // BEFORE MatrixLabels;
-  private cellLabel: CellLabel = new CellLabel();
+  private cellLabel: any; // BEFORE CellLabel = new CellLabel(); // error
   private menu: any; // BEFORE MatrixMenu;
   private timeSlider: any; // BEFORE MatrixTimeSlider;
   private overview: any; // BEFORE MatrixOverview;
   private _dgraph: dynamicgraph.DynamicGraph;
-  private times: queries.Time[];
-  public startTime: queries.Time;
-  public endTime: queries.Time;
+  private times: dynamicgraph.Time[];
+  public startTime: dynamicgraph.Time;
+  public endTime: dynamicgraph.Time;
   private nodeOrder: number[];
   private bbox: Box;
   private createOverviewImage: boolean;
@@ -950,7 +943,7 @@ class Matrix {
   private _scale: number;
   private _cellSize: any;
   private initialCellSize: any;
-  private hoveredLinks: queries.Link[];
+  private hoveredLinks: dynamicgraph.Link[];
   private labelLength: number = 0;
   public margin: NMargin;
 
@@ -1074,12 +1067,13 @@ class Matrix {
         this.nodeOrder[nodes2[i].id()] = i;
       }
     } else if (orderType == 'similarity') {
+      console.log("SIMILARITY");
       let config: ordering.OrderingConfiguration = new ordering.OrderingConfiguration(this.startTime, this.endTime);
-      // config.start = this.startTime;
-      // config.end = this.endTime;
       config.nodes = this._dgraph.nodes().visible().toArray();
       config.links = this._dgraph.links().presentIn(this.startTime, this.endTime).visible().toArray();
+      console.log("ORDERING NODES");
       this.nodeOrder = ordering.orderNodes(this._dgraph, config);
+      console.log("FINISH");
     } else {
       let visibleNodes = this._dgraph.nodes().visible().toArray();
       this.nodeOrder = [];
@@ -1128,17 +1122,17 @@ class Matrix {
     // console.log("updateVis");
     this.updateVisibleBox();
     let leftNodes = this.dgraph.nodes().visible().toArray();
-    leftNodes = leftNodes.filter(d =>
+    leftNodes = leftNodes.filter((d: any) =>
       this.nodeOrder[d.id()] >= this.bbox.y0 &&
       this.nodeOrder[d.id()] <= this.bbox.y1);
     let topNodes = this.dgraph.nodes().visible().toArray();
-    topNodes = topNodes.filter(d =>
+    topNodes = topNodes.filter((d: any) =>
       this.nodeOrder[d.id()] >= this.bbox.x0 &&
       this.nodeOrder[d.id()] <= this.bbox.x1);
 
-    let visibleData: { [id: number]: { [id: number]: queries.NodePair } } = {};
+    let visibleData: { [id: number]: { [id: number]: dynamicgraph.NodePair } } = {};
     let row, col: number;
-    let node: queries.Node;
+    let node: dynamicgraph.Node;
 
     for (let i = 0; i < leftNodes.length; i++) {
       node = leftNodes[i];
@@ -1179,13 +1173,13 @@ class Matrix {
   }
   highlightLinks(highlightedIds: number[]) {
     if (highlightedIds.length > 0) {
-      let highlightedLinks: (queries.Link | undefined)[] = highlightedIds.map(
+      let highlightedLinks: (dynamicgraph.Link | undefined)[] = highlightedIds.map(
         (d) => this._dgraph.link(d));
       messenger.highlight('set', <utils.ElementCompound>{ links: highlightedLinks });
     } else
       messenger.highlight('reset');
   }
-  nodeClicked(d: queries.Node) {
+  nodeClicked(d: dynamicgraph.Node) {
     let selections = d.getSelections();
     let currentSelection = this._dgraph.getCurrentSelection();
     for (let j = 0; j < selections.length; j++) {
@@ -1199,7 +1193,7 @@ class Matrix {
   }
   highlightNodes(highlightedIds: number[]) {
     if (highlightedIds.length > 0) {
-      let highlightedNodes: (queries.Node | undefined)[] = highlightedIds.map(
+      let highlightedNodes: (dynamicgraph.Node | undefined)[] = highlightedIds.map(
         (d) => this._dgraph.node(d));
       messenger.highlight('set', <utils.ElementCompound>{ nodes: highlightedNodes });
     } else

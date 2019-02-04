@@ -2,5 +2,5 @@
 *.js.map
 debug/*
 node_modules
-src/visualizations
-src/web
+build
+lib
