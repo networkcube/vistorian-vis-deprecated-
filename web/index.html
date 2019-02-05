@@ -2,39 +2,41 @@
 <html>
 
 <head>
-    <link rel="stylesheet" type="text/css" href="./static/styles1.css">
-    <link rel="stylesheet" type="text/css" href="./static/styles2.css">
-
-    <!-- VS: Call to trace.js -->
-    <script type="text/javascript" src="./traces/trace.js"></script>
-
-    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBLqH0fxzF-b2Z6uxbzqGKJy09tUQ3C3IM&sensor=false"></script>
-    <!--<script src="lib/d3.js"></script>
-    <script src="lib/seedrandom.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="../../styles.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="lib/three.js"></script>
+    <script src="lib/numeric-1.2.6.min.js"></script>
+    <script src="../../../networkcube/core/lib/jquery.js"></script>
+    <script src="../../../networkcube/core/networkcube.js"></script>
+    <script src="fonts/helvetiker_bold.typeface.js"></script>
+    <script src="fonts/helvetiker_regular.typeface.js"></script>
+    <script src="../utils/animations.js"></script>
+    <script src="../widgets/widgets.js"></script>
 </head>
-<title>Map</title>
+<title></title>
 
 <body>
-    <!-- VS: Call to trace_test_130529 -->
-    <script type="text/javascript" src="./traces/trace_test_130529.js"></script>
     <div>
-        <div id="menuDiv">
-
-            <!-- VS: Clicks on Manual -->
-            <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#geomap-visualization-map"
-                onclick="trace.event('help', 'ts_mapVisManual', 'CCC', 'DDD')">Manual</a>
-        </div>
-        <div id="timelineDiv">
-        </div>
-        <div id="visDiv">
-        </div>
+        Zoom:
+        <input id="rowHeightInput" type="range" name="cellSizeBox" min="3" max="50" onchange="updateRowHeight()" value="20" />
     </div>
-    <script src="../node_modules/jquery/dist/jquery.js"></script>
-    <script src="../node_modules/d3/build/d3.js"></script>
-    <script src="../node_modules/moment/moment.js"></script>
-    <script src="../lib/index.js"></script>
+    <div id="timelineDiv">
+    </div>
+    <div id="visDiv">
+        <svg id="visSvg">
+            <foreignObject id="visCanvasFO">
+            </foreignObject>
+        </svg>
+    </div>
+    </div>
+    <script type="x-shader/x-vertex" id="vertexshader">
+        attribute vec3 customColor; attribute float alpha; varying vec3 vColor; void main() { vColor = customColor; gl_Position =
+        projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentshader">
+        varying vec3 vColor; void main() { gl_FragColor = vec4( vColor, 1); // gl_FragColor = vec4( vColor, 1); }
+    </script>
+    <script src="linkwave.js"></script>
 </body>
 
 </html>

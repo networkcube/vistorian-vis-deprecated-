@@ -13,6 +13,9 @@
     },
     "pretty": false,
     "files": [
-        "./src/map.ts"
+        "./src/linkwave.ts",
+        "./src/sorting.ts",
+        "./src/features.ts",
+        "./src/clustering.ts"
     ]
 }
