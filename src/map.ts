@@ -1,20 +1,14 @@
 /// <reference path="lib/google.maps.d.ts" />
 
-import {
-    dynamicgraph,
-    utils,
-    queries,
-    main,
-    messenger
-} from './vistorian-core-imports';
+import * as dynamicgraph from 'vistorian-core/src/dynamicgraph';
+import * as utils from 'vistorian-core/src/utils';
+import * as main from 'vistorian-core/src/main';
+import * as messenger from 'vistorian-core/src/messenger';
 
-import {
-    makeSlider,
-    TimeSlider
-} from './vistorian-widgets-imports';
+import * as ui from 'vistorian-widgets/src/ui';
+import * as timeslider from 'vistorian-widgets/src/timeslider';
 
 import * as d3 from 'd3';
-//import * as $ from 'jquery';
 import * as moment from 'moment';
 
 var COLOR_DEFAULT_LINK: string = '#999999';
@@ -42,7 +36,7 @@ var MENU_HEIGHT: number = 50;
 
 var dgraph: dynamicgraph.DynamicGraph = main.getDynamicGraph();
 // get dynamic graph
-var links: queries.Link[] = dgraph.links().toArray();
+var links: dynamicgraph.Link[] = dgraph.links().toArray();
 var times: any[] = dgraph.times().toArray();
 var locations: any[] = dgraph.locations().toArray();
 for (var i = 0; i < locations.length; i++) {
@@ -76,10 +70,10 @@ export class NodePositionObject {
     displaced: boolean = false; // INIT ??
     displacementVector: number[] = []; // INIT ??
     fixedPosition: boolean = true;
-    inLinks: queries.Link[] = [];
-    outLinks: queries.Link[] = [];
-    inNeighbors: queries.Node[] = [];
-    outNeighbors: queries.Node[] = [];
+    inLinks: dynamicgraph.Link[] = [];
+    outLinks: dynamicgraph.Link[] = [];
+    inNeighbors: dynamicgraph.Node[] = [];
+    outNeighbors: dynamicgraph.Node[] = [];
 }
 
 var overlay: any;
@@ -362,7 +356,7 @@ function init() {
             n = nodes[i];
             positions = n.locationSerie().serie;
             // console.log('>', n.locationSerie().serie)
-            serie = new queries.ScalarTimeSeries<Object>();
+            serie = new dynamicgraph.ScalarTimeSeries<Object>();
             nodePositionObjectsLookupTable.push(serie);
             // console.log('ITERATE ALL NODES', positions.length);
             for (var tId in positions) {
@@ -662,7 +656,7 @@ function displayLocationsWindow(currentProjection: google.maps.MapCanvasProjecti
 
     // hit-test against every location we know about
     //      
-    var foundLocations: Array<queries.Location> = [];
+    var foundLocations: Array<dynamicgraph.Location> = [];
     locations.forEach(function (v, i, arr): void {
         var latlng = new google.maps.LatLng(v.latitude(), v.longitude());
         if (hittestRect.contains(latlng))
@@ -670,14 +664,14 @@ function displayLocationsWindow(currentProjection: google.maps.MapCanvasProjecti
     });
     // if there are any locations, then we need to find the
     // associated nodes
-    var foundNodes: Array<queries.Node>;
+    var foundNodes: Array<dynamicgraph.Node>;
     if (foundLocations.length > 0) {
         foundNodes = hittestNodeGeoPositions(hittestRect);
     } else {
         return false;
     }
 
-    var locationGroups: Array<{ loc: queries.Location, nodes: Array<queries.Node> }> = [];
+    var locationGroups: Array<{ loc: dynamicgraph.Location, nodes: Array<dynamicgraph.Node> }> = [];
     foundLocations.forEach(function (v, i, arr) {
         locationGroups.push({
             loc: v,
@@ -745,9 +739,9 @@ function displayLocationsWindow(currentProjection: google.maps.MapCanvasProjecti
 
 
 
-function hittestNodeGeoPositions(bounds: google.maps.LatLngBounds): Array<queries.Node> {
+function hittestNodeGeoPositions(bounds: google.maps.LatLngBounds): Array<dynamicgraph.Node> {
     var pos: google.maps.Point = new google.maps.Point(0, 0);
-    var result: Array<queries.Node> = [];
+    var result: Array<dynamicgraph.Node> = [];
     var n, locations;
     var llpos;
     for (var i = 0; i < dgraph.nodes().length; i++) {
@@ -764,14 +758,14 @@ function hittestNodeGeoPositions(bounds: google.maps.LatLngBounds): Array<querie
     return result;
 }
 
-function getNodeRelevantLocation(node: queries.Node): queries.Location | null {
+function getNodeRelevantLocation(node: dynamicgraph.Node): dynamicgraph.Location | null {
     if (node.locations().length == 0)
         return null;
     else
         return node.locations().last();
 }
 
-function getNodeLatLng(node: queries.Node): google.maps.LatLng {
+function getNodeLatLng(node: dynamicgraph.Node): google.maps.LatLng {
     if (node.locations().length == 0) {
         return new google.maps.LatLng(0, 0);
     } else {
@@ -781,7 +775,7 @@ function getNodeLatLng(node: queries.Node): google.maps.LatLng {
     }
 }
 
-function getNodeLocation(node: queries.Node): queries.Location | null {
+function getNodeLocation(node: dynamicgraph.Node): dynamicgraph.Location | null {
     if (node.locations().length == 0) {
         return null;
     } else {
@@ -845,9 +839,9 @@ function updateLinks() {
             var weight = linkWeightScale(d.weights(time_start, time_end).mean());
             if (weight < 0) {
                 weight = -weight;
-                d3.select(this).attr('stroke-dasharray', '1,2')
+                d3.select(self).attr('stroke-dasharray', '1,2') // BEFORE this ??
             } else {
-                d3.select(this).attr('stroke-dasharray', '0')
+                d3.select(self).attr('stroke-dasharray', '0') // BEFORE this ??
             }
             if (d.isHighlighted())
                 weight *= 2;
@@ -996,7 +990,7 @@ function updateLocationMarkers() {
 function updateLinkPaths() {
 
     var path: any, dir: any, offset: any, center: any;
-    var link: queries.Link | undefined;
+    var link: dynamicgraph.Link | undefined;
     var sourceNPO: any, targetNPO: any;
     var EDGE_GAP: any = 5
     var cx1: any, cy1: any, cx2: any, cy2: any;
@@ -1016,6 +1010,7 @@ function updateLinkPaths() {
             targetNPO = link.targetNPO;
         else
             targetNPO = undefined;
+
         if (targetNPO == undefined)
             targetNPO = { x: 0, y: 0 };
 
@@ -1098,28 +1093,28 @@ var timeSvg: any = d3.select('#timelineDiv')
 
 var OVERLAP_SLIDER_WIDTH = 100;
 if (dgraph.times().size() > 1) {
-    var timeSlider: TimeSlider.TimeSlider = new TimeSlider.TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
+    var timeSlider: timeslider.TimeSlider = new timeslider.TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
     timeSlider.appendTo(timeSvg);
     messenger.addEventListener('timeRange', timeChangedHandler);
 }
 
 // OVERLAP SLIDER    
 var menuDiv = d3.select('#menuDiv');
-makeSlider.makeSlider(menuDiv, 'Node Overlap', 100, MENU_HEIGHT, OVERLAP_FRACTION, -.05, 3, function (value: number) {
+ui.makeSlider(menuDiv, 'Node Overlap', 100, MENU_HEIGHT, OVERLAP_FRACTION, -.05, 3, function (value: number) {
     OVERLAP_FRACTION = value;
     updateNodePositions();
 })
 
 // LINK OPACITY SLIDER    
 var menuDiv = d3.select('#menuDiv');
-makeSlider.makeSlider(menuDiv, 'Link Opacity', 100, MENU_HEIGHT, INNER_OPACITY, 0, 1, function (value: number) {
+ui.makeSlider(menuDiv, 'Link Opacity', 100, MENU_HEIGHT, INNER_OPACITY, 0, 1, function (value: number) {
     INNER_OPACITY = value;
     updateLinks();
 })
 
 // NON-POSITIONED NODES OPACITY SLIDER    
 var menuDiv = d3.select('#menuDiv');
-makeSlider.makeSlider(menuDiv, 'Opacity of Positionless Nodes', 200, MENU_HEIGHT, INNER_OPACITY, 0, 1, function (value: number) {
+ui.makeSlider(menuDiv, 'Opacity of Positionless Nodes', 200, MENU_HEIGHT, INNER_OPACITY, 0, 1, function (value: number) {
     NODE_UNPOSITIONED_OPACITY = value;
     updateNodes();
 })
@@ -1167,11 +1162,14 @@ function timeChangedHandler(m: messenger.TimeRangeMessage) {
 }
 
 
-function updateEvent(m: messenger.Message) {
+function updateEvent(m: messenger.TimeRangeMessage) { // BEFORE messenger.Message) {
     if (m && m.type == 'timeRange' && dgraph.times().size() > 1) {
+        /* BEFORE
         time_start = dgraph.time(m.startId);
         time_end = dgraph.time(m.endId);
         timeSlider.set(time_start, time_end);
+        */
+        timeSlider.set(m.startUnix, m.endUnix);
     }
 
     updateLinks();
@@ -1239,16 +1237,16 @@ function updateNodePositions() {
 function updateNodeDisplacementVectors() {
 
     // calculate angles: 
-    var l: queries.Location;
+    var l: dynamicgraph.Location;
     var localNPOs: any[];
     for (var i = 0; i < locations.length; i++) {
         l = locations[i];
         localNPOs = []
         // filter npos present in this time
-        for (var j = 0; j < l.npos.length; j++) {
-            if (l.npos[j].timeIds[0] <= time_end.id()
-                && l.npos[j].timeIds[l.npos[j].timeIds.length - 1] >= time_start.id()) {
-                localNPOs.push(l.npos[j]);
+        for (var j = 0; j < (l as any)['npos'].length; j++) {
+            if ((l as any)['npos'][j].timeIds[0] <= time_end.id()
+                && (l as any)['npos'][j].timeIds[(l as any)['npos'][j].timeIds.length - 1] >= time_start.id()) {
+                localNPOs.push((l as any)['npos'][j]);
             }
         }
         if (localNPOs.length == 1) {
@@ -1271,7 +1269,7 @@ function updateNodeDisplacementVectors() {
     // create displacement vector for each NPO
 }
 
-function getNodePositionObjectsForLocation(n: queries.Node, long: number, lat: number): NodePositionObject {
+function getNodePositionObjectsForLocation(n: dynamicgraph.Node, long: number, lat: number): NodePositionObject {
     var s: any = nodePositionObjectsLookupTable[n.id()]
     var npo: any;
     long = Math.round(long * 100) / 100
@@ -1302,7 +1300,7 @@ function getNodePositionObjectsForLocation(n: queries.Node, long: number, lat: n
 }
 
 
-function getNodePositionObjectAtTime(n: queries.Node, tId: number): Object {
+function getNodePositionObjectAtTime(n: dynamicgraph.Node, tId: number): Object {
     var s: any = nodePositionObjectsLookupTable[n.id()]
     var npo: any;
     // console.log('s.serie[tId]', tId, s.serie[tId])
