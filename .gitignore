@@ -1,6 +1,3 @@
-.DS_Store
-*.js.map
-debug/*
 node_modules
-src/visualizations
-src/web
+/lib
+/build/*

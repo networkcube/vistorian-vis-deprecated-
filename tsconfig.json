@@ -1,18 +1,18 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "module": "system",
-        "lib": ["es6", "dom"],
+        "outDir": "./build/",
+        "target": "es6",
+        "module": "es2015",
         "sourceMap": true,
-        //"outFile": "./lib/index.js",
         "strict": true,
         "esModuleInterop": true,
-        "allowSyntheticDefaultImports": false,
+        "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "declaration": true
     },
     "pretty": false,
     "files": [
-        "./src/bookmarkbrowser/bookmarkbrowser.ts"
+        "./src/nodelink.ts"
     ]
 }
