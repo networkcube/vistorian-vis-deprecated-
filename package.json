@@ -1,7 +1,7 @@
 {
-    "name": "vistorian-nodelink",
+    "name": "vistorian-vis",
     "version": "0.0.1-alpha",
-    "description": "Vistorian-nodelink is a java script / (Typescript) library and a programming framework for interactive network visualizations with:",
+    "description": "Vistorian-vis is a java script / (Typescript) library and a programming framework for interactive network visualizations with:",
     "main": "lib/index.js",
     "types": "lib/index.d.js",
     "scripts": {

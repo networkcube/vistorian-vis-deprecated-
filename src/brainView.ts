@@ -2,19 +2,30 @@
 /// brainView.ts.  Copyright (c) 2014 Microsoft Corporation.
 ///     - manages a 3D view of the brain, with support for brushing and linking.
 ///-----------------------------------------------------------------------------------------------------------------
-/// <reference path="../../core/networkcube.d.ts"/>
-/// <reference path="../widgets/widgets.d.ts" />
-/// <reference path="../utils/animations.d.ts" />
 
+// <reference path="../utils/animations.d.ts" />
 
-var SPHERE_RADIUS = 2;
-var COLOR_LINK = 0x333333;
-var COLOR_NODE = 0x666666;
-var COLOR_HIGHLIGHT = 0xff0000;
+import * as dynamicgraph from 'vistorian-core/src/dynamicgraph';
+import * as utils from 'vistorian-core/src/utils';
+import * as main from 'vistorian-core/src/main';
+import * as messenger from 'vistorian-core/src/messenger';
+import * as datamanager from 'vistorian-core/src/datamanager';
 
-var OPACITY_LINE_DEFAULT = .5;
+import * as d3 from 'd3';
+import * as THREE from 'three';
+import $ from 'jquery';
 
-var LINK_WIDTH_FACTOR = 10;
+import * as timeslider from 'vistorian-widgets/src/timeslider';
+import * as rangeslider from 'vistorian-widgets/src/rangeslider';
+
+var SPHERE_RADIUS: number = 2;
+var COLOR_LINK: number = 0x333333;
+var COLOR_NODE: number = 0x666666;
+var COLOR_HIGHLIGHT: number = 0xff0000;
+
+var OPACITY_LINE_DEFAULT: number = .5;
+
+var LINK_WIDTH_FACTOR: number = 10;
 
 var DURATION: number = 500;
 
@@ -31,51 +42,51 @@ class NBounds {
 var width: number = window.innerWidth;
 var height: number = window.innerHeight;
 
-var urlVars: Object = networkcube.getUrlVars();
+var urlVars: Object = utils.getUrlVars();
 
 
 // GET DATA
-var _graph: networkcube.DynamicGraph = networkcube.getDynamicGraph();
-var startTime: networkcube.Time = _graph.startTime;
-var endTime: networkcube.Time = _graph.endTime;
+var _graph: dynamicgraph.DynamicGraph = main.getDynamicGraph();
+var startTime: dynamicgraph.Time = _graph.startTime;
+var endTime: dynamicgraph.Time = _graph.endTime;
 
 // EVENT HANDLERS
-networkcube.setDefaultEventListener(updateEvent);
-networkcube.addEventListener('timeRange', timeRangeHandler);
+messenger.setDefaultEventListener(updateEvent);
+messenger.addEventListener('timeRange', timeRangeHandler);
 
 
 // data
-var brainModel;
-var nodes = _graph.nodes().toArray();
-var links = _graph.links().toArray();
+var brainModel: any;
+var nodes: dynamicgraph.Node[] = _graph.nodes().toArray();
+var links: dynamicgraph.Link[] = _graph.links().toArray();
 //var _windowCount = endTime.id - startTime.id;
-var _correlations = _graph.links();
+var _correlations: dynamicgraph.LinkQuery = _graph.links();
 
 // colors
-var _defaultColor = 0x293d66;
-var _overColor = 0xe31a1c;
+var _defaultColor: any = 0x293d66;
+var _overColor: any = 0xe31a1c;
 
 // current state
 var _subjectSelection: number;
 var _currentTime: number;
 
 var _ctx: CanvasRenderingContext2D;
-var _drawTimer = 0;
+var _drawTimer: number = 0;
 
 // create timeslider
-var timeSvg = d3.select('#menubar')
+var timeSvg: any = d3.select('#menubar')
     .append('svg')
     .attr('width', width)
     .attr('height', 50);
 
-var linkWtFilterWidth = width - 150;
-var linkWtFilterSvg = d3.select('#footerbar')
+var linkWtFilterWidth: number = width - 150;
+var linkWtFilterSvg: any = d3.select('#footerbar')
     .append('svg')
     .style('float', 'right')
     .attr('width', linkWtFilterWidth)
     .attr('height', 50);
 
-var vector; // mous vector
+var vector: any; // mous vector
 var canvasWidth: number = width;
 var canvasHeight: number = height - $('#menubar').height() - $('#footerbar').height();
 
@@ -109,9 +120,9 @@ var canvas: any;
 var links3D: any;
 var node3DIndices: any;
 
-var nodes3D = [];
-var timeSlider: TimeSlider;
-var linkWeightFilterSlider: RangeSlider;
+var nodes3D: any[] = [];
+var timeSlider: timeslider.TimeSlider;
+var linkWeightFilterSlider: rangeslider.RangeSlider;
 
 var transition: animations.Transition;
 
@@ -124,7 +135,7 @@ function load3DBrain() {
 
 function init() {
 
-    var container = document.createElement('div');
+    var container: any = document.createElement('div');
     $('#maindiv').append(container);
 
     camera = new THREE.PerspectiveCamera(45,
@@ -150,23 +161,23 @@ function init() {
 
     scene = new THREE.Scene();
 
-    var ambient = new THREE.AmbientLight(0x1f1f1f);
+    var ambient: THREE.AmbientLight = new THREE.AmbientLight(0x1f1f1f);
     scene.add(ambient);
 
-    var directionalLight = new THREE.DirectionalLight(0x1f1f1f);
+    var directionalLight: THREE.DirectionalLight = new THREE.DirectionalLight(0x1f1f1f);
     directionalLight.position.set(0, 0, 1);
     scene.add(directionalLight);
 
 
     // texture
 
-    var manager = new THREE.LoadingManager();
+    var manager: THREE.LoadingManager = new THREE.LoadingManager();
     manager.onProgress = function (item, loaded, total) {
         //console.log(item, loaded, total);
     };
 
     // brainsurface model
-    var loader = new (<any>THREE).OBJLoader(manager);
+    var loader: any = new (<any>THREE).OBJLoader(manager);
     //loader.load('BrainMesh_ch2.obj', loadBrainSurface);
     loader.load('BrainMesh_ICBM152_smoothed.obj', loadBrainSurface);
 
@@ -179,7 +190,7 @@ function init() {
     canvas = renderer.domElement;
     $('#menubar').after(canvas);
     canvas.addEventListener('mousemove', (function (thisclass) {
-        return function (e) {
+        return function (e: any) {
             thisclass.mousemove(e)
         }
     })(this));
@@ -189,15 +200,15 @@ function init() {
 
 
     // attach timeslider
-    timeSlider = new TimeSlider(_graph, width - 50);
+    timeSlider = new timeslider.TimeSlider(_graph, width - 50);
     timeSlider.appendTo(timeSvg);
 
-    linkWeightFilterSlider = new RangeSlider(50, 25, linkWtFilterWidth - 100, -1, 1, 0.5, true);
+    linkWeightFilterSlider = new rangeslider.RangeSlider(50, 25, linkWtFilterWidth - 100, -1, 1, 0.5, true);
     linkWeightFilterSlider.appendTo(linkWtFilterSvg);
-    linkWeightFilterSlider.setDragEndCallBack((min, max) => {
+    linkWeightFilterSlider.setDragEndCallBack((min: any, max: any) => {
         updateEvent(null);
     });
-    $('#invertFilter').click(function (e) {
+    $('#invertFilter').click(function (e: any) {
         linkWeightFilterSlider.setIsInverted($('#invertFilter').prop('checked'));
         updateEvent(null);
     });
@@ -207,26 +218,26 @@ function createNodeLink3D() {
 
     // create spheres for each ROIs and position in MNI space
     node3DIndices = [];
-    var nodesColors = [];
+    var nodesColors: any[] = [];
     //#293d66;
-    var defaultColor = new THREE.Color(COLOR_NODE);
-    var node: networkcube.Node  ;
+    var defaultColor: THREE.Color = new THREE.Color(COLOR_NODE);
+    var node: dynamicgraph.Node;
     // assign positions
     for (var i = 0; i < nodes.length; i++) {
         nodesColors[i] = defaultColor;
         node = nodes[i];
-        var location = node.locations().last();
-        node.x = location.x();
-        node.y = location.y();
-        node.z = location.z();
-        node.radius = location.radius();
+        var location: dynamicgraph.Location = node.locations().last();
+        (node as any).x = location.x();
+        (node as any).y = location.y();
+        (node as any).z = location.z();
+        (node as any).radius = location.radius();
 
-        var ROIMaterial = new THREE.MeshBasicMaterial({ color: COLOR_NODE, shading: THREE.NoShading });
-        var radius = SPHERE_RADIUS;
-        if (node.radius)
-            radius = node.radius;
-        var node3D = new THREE.Mesh(new THREE.SphereGeometry(node.radius, 20, 20), ROIMaterial);
-        node3D.position.set(node.x, node.y, node.z);
+        var ROIMaterial: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial(<THREE.MeshBasicMaterialParameters>{ color: COLOR_NODE }); // , shading: THREE.NoShading
+        var radius: number = SPHERE_RADIUS;
+        if ((node as any).radius)
+            radius = (node as any).radius;
+        var node3D: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry((node as any).radius, 20, 20), ROIMaterial);
+        node3D.position.set((node as any).x, (node as any).y, (node as any).z);
 
         // keep index to update node color/visibility later
         node3DIndices.push(scene.children.length);
@@ -237,28 +248,28 @@ function createNodeLink3D() {
 
     // create correlations objects
     links3D = [];
-    var link;
+    var link: dynamicgraph.Link;
     for (var i = 0; i < links.length; i++) {
         link = links[i];
-        var u = link.source
-        var v = link.target;
-        var corrValue = link.weights(startTime, endTime).mean()
+        var u: dynamicgraph.Node = link.source
+        var v: dynamicgraph.Node = link.target;
+        var corrValue: number = link.weights(startTime, endTime).mean()
 
         if (!corrValue || corrValue < 0)
             continue;
 
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(u.x, u.y, u.z));
-        geometry.vertices.push(new THREE.Vector3(v.x, v.y, v.z));
+        var geometry: THREE.Geometry = new THREE.Geometry();
+        geometry.vertices.push(new THREE.Vector3((u as any).x, (u as any).y, (u as any).z));
+        geometry.vertices.push(new THREE.Vector3((v as any).x, (v as any).y, (v as any).z));
 
-        var correlationMaterial = new THREE.LineBasicMaterial({
+        var correlationMaterial: THREE.LineBasicMaterial = new THREE.LineBasicMaterial({
             color: COLOR_LINK,
             transparent: true,
             opacity: OPACITY_LINE_DEFAULT,
             linewidth: corrValue * LINK_WIDTH_FACTOR
         })
 
-        var line = new THREE.Line(geometry, correlationMaterial);
+        var line: THREE.Line = new THREE.Line(geometry, correlationMaterial);
         //keep index to update the links later
         links3D.push(line);
         scene.add(line);
@@ -283,8 +294,8 @@ function isOutsideLinkWeightFilter(v: number): boolean {
 
 function updateLinks() {
     var corrValue: number;
-    var link: networkcube.Link;
-    var color;
+    var link: dynamicgraph.Link;
+    var color: any;
     for (var i = 0; i < links3D.length; i++) {
         link = links[i];
         // we use the values mean to determine whether to display the link
@@ -323,7 +334,7 @@ function updateLinks() {
         if (link.isHighlighted()) {
             color = COLOR_HIGHLIGHT;
         } else if (link.isSelected()) {
-            color = networkcube.getPriorityColor(link);
+            color = utils.getPriorityColor(link);
             if (!color)
                 color = COLOR_LINK;
         } else {
@@ -336,9 +347,9 @@ function updateLinks() {
 
 function updateNodes() {
 
-    var node: networkcube.Node;
-    var color;
-    var n3d;
+    var node: dynamicgraph.Node;
+    var color: any;
+    var n3d: any;
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
         n3d = node['mesh'];
@@ -360,7 +371,7 @@ function updateNodes() {
         if (node.isHighlighted()) {
             color = COLOR_HIGHLIGHT
         } else if (node.isSelected()) {
-            color = networkcube.getPriorityColor(node);
+            color = utils.getPriorityColor(node);
             if (!color) {
                 color = COLOR_NODE;
             }
@@ -371,17 +382,16 @@ function updateNodes() {
     }
 }
 
-function loadBrainSurface(object) {
+function loadBrainSurface(object: any) {
 
-    object.traverse(function (child) {
+    object.traverse(function (child: any) {
         if (child instanceof THREE.Mesh) {
-            child.material
-                = new THREE.MeshLambertMaterial({
-                    color: 0xbbbbbb,
-                    transparent: true,
-                    opacity: 0.1,
-                    side: THREE.DoubleSide
-                });
+            child.material = new THREE.MeshLambertMaterial({
+                color: 0xbbbbbb,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.DoubleSide
+            });
         }
 
     });
@@ -402,12 +412,12 @@ function render() {
     renderer.render(scene, camera);
 }
 
-function mousemove(event) {
+function mousemove(event: any) {
 
     // Ray cast to detect if user hovers ROI
     vector = new THREE.Vector3();
-    var raycaster = new THREE.Raycaster();
-    var dir = new THREE.Vector3();
+    var raycaster: THREE.Raycaster = new THREE.Raycaster();
+    var dir: THREE.Vector3 = new THREE.Vector3();
 
     vector.set(
         ((event.clientX - 10) / canvasWidth) * 2 - 1,
@@ -419,10 +429,10 @@ function mousemove(event) {
     raycaster.set(camera.position,
         vector.sub(camera.position).normalize());
 
-    var hoveredLinks;
+    var hoveredLinks: any;
     // Look for intersected links
-    var intersected = raycaster.intersectObjects(links3D);
-    var index
+    var intersected: THREE.Intersection[] = raycaster.intersectObjects(links3D);
+    var index: number;
     if (intersected.length > 0) {
         for (var i = 0; i < intersected.length; i++) {
             index = links3D.indexOf(intersected[i].object)
@@ -431,7 +441,7 @@ function mousemove(event) {
     }
 
     // Look for intersected nodes
-    var hoveredNodes;
+    var hoveredNodes: any;
     intersected = raycaster.intersectObjects(nodes3D);
     if (intersected.length > 0) {
         for (var i = 0; i < intersected.length; i++) {
@@ -454,8 +464,8 @@ function mousemove(event) {
     } else {
         $('#brainROIlabel').remove();
     }
-    networkcube.highlight('set', <networkcube.ElementCompound>{ links: hoveredLinks });
-    networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: hoveredNodes });
+    messenger.highlight('set', <utils.ElementCompound>{ links: hoveredLinks });
+    messenger.highlight('set', <utils.ElementCompound>{ nodes: hoveredNodes });
 
     renderer.render(scene, camera);
 }
@@ -473,19 +483,19 @@ function click() {
             if (!nodes[i].isSelected()) {
                 // if this element has not been selected yet,
                 // add it to current selection.
-                networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [nodes[i]] });
+                messenger.selection('add', <utils.ElementCompound>{ nodes: [nodes[i]] });
             } else {
-                var selections = nodes[i].getSelections();
-                var currentSelection = _graph.getCurrentSelection();
+                var selections: datamanager.Selection[] = nodes[i].getSelections();
+                var currentSelection: datamanager.Selection = _graph.getCurrentSelection();
                 for (var j = 0; j < selections.length; j++) {
                     if (selections[j] == currentSelection) {
-                        networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [nodes[i]] });
+                        messenger.selection('remove', <utils.ElementCompound>{ nodes: [nodes[i]] });
                         return;
                     }
                 }
                 // current selection has not been found among already
                 // assigned selections, hence add this selection
-                networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [nodes[i]] });
+                messenger.selection('add', <utils.ElementCompound>{ nodes: [nodes[i]] });
             }
         }
     }
@@ -501,19 +511,19 @@ function click() {
             if (!links[i].isSelected()) {
                 // if this element has not been selected yet,
                 // add it to current selection.
-                networkcube.selection('add', <networkcube.ElementCompound>{ links: [links[i]] });
+                messenger.selection('add', <utils.ElementCompound>{ links: [links[i]] });
             } else {
-                var selections = links[i].getSelections();
-                var currentSelection = _graph.getCurrentSelection();
+                var selections: datamanager.Selection[] = links[i].getSelections();
+                var currentSelection: datamanager.Selection = _graph.getCurrentSelection();
                 for (var j = 0; j < selections.length; j++) {
                     if (selections[j] == currentSelection) {
-                        networkcube.selection('remove', <networkcube.ElementCompound>{ links: [links[i]] });
+                        messenger.selection('remove', <utils.ElementCompound>{ links: [links[i]] });
                         return;
                     }
                 }
                 // current selection has not been found among already
                 // assigned selections, hence add this selection
-                networkcube.selection('add', <networkcube.ElementCompound>{ links: [links[i]] });
+                messenger.selection('add', <utils.ElementCompound>{ links: [links[i]] });
             }
         }
     }
@@ -547,11 +557,12 @@ function showBrain() {
 }
 
 
-function timeRangeHandler(m: networkcube.TimeRangeMessage) {
-    startTime = _graph.time(m.startId);
-    endTime = _graph.time(m.endId);
+function timeRangeHandler(m: messenger.TimeRangeMessage) {
+    // startTime = _graph.time(m.startId);
+    // endTime = _graph.time(m.endId);
     updateLinks();
-    timeSlider.set(startTime, endTime);
+    //timeSlider.set(startTime, endTime);
+    timeSlider.set(m.startUnix, m.endUnix);
 }
 
 // Disables trackball controls, otherwise bugs
@@ -570,7 +581,7 @@ function mouseOver() {
 
 // NETWORKCUBE EVENTS
 
-function updateEvent(m: networkcube.Message) {
+function updateEvent(m: messenger.Message) {
 
     transition = new animations.Transition(render);
 
