@@ -189,11 +189,11 @@ function init() {
     renderer.setClearColor(0xFFFFFF, 1);
     canvas = renderer.domElement;
     $('#menubar').after(canvas);
-    canvas.addEventListener('mousemove', (function (thisclass) {
+    canvas.addEventListener('mousemove', (function (thisclass: any) {
         return function (e: any) {
             thisclass.mousemove(e)
         }
-    })(this));
+    })); // CHANGE!! ELIMINATE THIS!
     canvas.addEventListener('mouseout', mouseOut);
     canvas.addEventListener('mouseover', mouseOver);
     canvas.addEventListener('click', click);
@@ -241,8 +241,8 @@ function createNodeLink3D() {
 
         // keep index to update node color/visibility later
         node3DIndices.push(scene.children.length);
-        nodes3D.push(node3D)
-        node['mesh'] = node3D;
+        nodes3D.push(node3D);
+        (node as any)['mesh'] = node3D;
         scene.add(node3D);
     }
 
@@ -326,11 +326,12 @@ function updateLinks() {
             ));
         }
 
-        // corrValue = link.weights(startTime, endTime).mean()
-        // if (!corrValue || corrValue < 0)
-        //     continue;
+        /* BEFORE THIS WAS COMMENT */
+        corrValue = link.weights(startTime, endTime).mean()
+        if (!corrValue || corrValue < 0)
+            continue;
 
-        links3D[i].material.linewidth = corrValue * LINK_WIDTH_FACTOR;
+        links3D[i].material.linewidth = corrValue * LINK_WIDTH_FACTOR; // NOT INIT CORRVALUE!!
         if (link.isHighlighted()) {
             color = COLOR_HIGHLIGHT;
         } else if (link.isSelected()) {
@@ -352,7 +353,7 @@ function updateNodes() {
     var n3d: any;
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
-        n3d = node['mesh'];
+        n3d = (node as any)['mesh'];
 
 
         // CHECK AND UPDATE VISIBILITY
@@ -486,7 +487,7 @@ function click() {
                 messenger.selection('add', <utils.ElementCompound>{ nodes: [nodes[i]] });
             } else {
                 var selections: datamanager.Selection[] = nodes[i].getSelections();
-                var currentSelection: datamanager.Selection = _graph.getCurrentSelection();
+                var currentSelection: any = _graph.getCurrentSelection();
                 for (var j = 0; j < selections.length; j++) {
                     if (selections[j] == currentSelection) {
                         messenger.selection('remove', <utils.ElementCompound>{ nodes: [nodes[i]] });
@@ -514,7 +515,7 @@ function click() {
                 messenger.selection('add', <utils.ElementCompound>{ links: [links[i]] });
             } else {
                 var selections: datamanager.Selection[] = links[i].getSelections();
-                var currentSelection: datamanager.Selection = _graph.getCurrentSelection();
+                var currentSelection: any = _graph.getCurrentSelection();
                 for (var j = 0; j < selections.length; j++) {
                     if (selections[j] == currentSelection) {
                         messenger.selection('remove', <utils.ElementCompound>{ links: [links[i]] });
@@ -581,7 +582,7 @@ function mouseOver() {
 
 // NETWORKCUBE EVENTS
 
-function updateEvent(m: messenger.Message) {
+function updateEvent(m: messenger.Message | null) {
 
     transition = new animations.Transition(render);
 
