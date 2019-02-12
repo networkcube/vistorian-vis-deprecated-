@@ -206,8 +206,8 @@ class MatrixOverview {
 
     this.focusColor = "#ccc";
 
-
     let g = this.svg.append('g');
+
     this.contextPattern = g.append("defs")
       .append("pattern")
       .attr("id", "bg")
@@ -215,11 +215,9 @@ class MatrixOverview {
       .attr("width", this.width)
       .attr("height", this.height);
 
-
     this.contextImg = this.contextPattern.append("image")
       .attr("width", this.width)
       .attr("height", this.height);
-
 
     this.context = g.append("rect")
       .attr("class", "context")
@@ -227,7 +225,9 @@ class MatrixOverview {
       .attr("height", this.height)
       .attr("stroke", "#aaa")
       .attr("fill", "white");
+
     g = this.svg.append('g');
+
     this.focus = g.append("rect")
       .attr("class", "focus")
       .attr("fill", this.focusColor)
@@ -235,16 +235,19 @@ class MatrixOverview {
 
     this.zoom = d3.zoom()
       // .scaleExtent([0.2, 4])
-      .on('zoom', this.zoomed);
+      //.on('zoom', this.zoomed);
 
-    this.focus.call(this.zoom);
+    this.focus.call(this.zoom);//.on('zoom', this.zoomed));
 
   }
 
   private zoomed = () => {
-    let z: number, tr: number[];
-    z = this.zoom.scale();
-    tr = this.zoom.translate();
+    let z: number, tr: any[] = [];
+    var transform: any = d3.zoomTransform(this.svg.node());
+    z = transform.k;
+    tr[0] = transform.x;
+    tr[1] = transform.y;
+    console.log("ZOOMED MATRIX OVERVIEW")
     this.updateTransform(z, tr);
   }
 
@@ -259,6 +262,7 @@ class MatrixOverview {
   }
 
   updateTransform(z: any, tr: any) {
+    console.log("UPDATE TRANSFORM MATRIX OVERVIEW")
     tr[0] = -tr[0] * this.ratio;
     tr[1] = -tr[1] * this.ratio;
     this.matrix.updateTransform(z, tr);
@@ -267,11 +271,16 @@ class MatrixOverview {
     visibleW: number, visibleH: number,
     r: number,
     z: number, tr: number[]) {
+    console.log("UPDATE FOCUS MATRIX OVERVIEW!")
     tr[0] = -tr[0] / this.ratio;
     tr[1] = -tr[1] / this.ratio;
     this.ratio = r / this.height;
-    this.zoom.scale(z);
-    this.zoom.translate(tr);
+
+    // HERE NOT CALL TO ZOOMED FUNCTION! WHY?!
+    this.zoom.scaleTo(this.focus, z);
+    this.zoom.translateTo(this.focus, tr);
+
+    console.log("POST SCALE AND TRANSLATE MATRIX OVERVIEW")
 
     let focusX = matrixX0 * this.width;
     let focusY = matrixY0 * this.height;
@@ -432,7 +441,7 @@ class MatrixVisualization {
   private previousHoveredLinks: number[] | undefined;
   private canvas: any; // HTMLCanvasElement = new HTMLCanvasElement();
   private view: any; // BEFORE D3.Selection;
-  private zoom: any; // BEFORE D3.Behavior.Zoom;
+  private zoom: d3.ZoomBehavior | undefined = undefined;
   private scene: any; // BEFORE THREE.Scene = new THREE.Scene();
   private camera: any; // BEFORE THREE.OrthographicCamera;
   private renderer: any; // BEFORE THREE.WebGLRenderer = new THREE.WebGLRenderer();
@@ -472,13 +481,15 @@ class MatrixVisualization {
     this.init();
   }
   init() {
+    console.log("INIT!! MATRIX VIS")
     this.initWebGL();
     this.elem.node().appendChild(this.canvas);
     this.view = d3.select(this.canvas);
-    this.zoom = d3.zoom()
+    this.zoom = d3.zoom();
       //.scaleExtent([0.2, 4])
-      .on('zoom', this.zoomed);
-    this.view.call(this.zoom);
+      //.on('zoom', this.zoomed);
+    this.view.call(this.zoom);//.on('zoom', this.zoomed));
+    //this.zoom.on('zoom', this.zoomed);
     this.initGeometry();
     this.cellSize = this.matrix.cellSize;
 
@@ -577,7 +588,8 @@ class MatrixVisualization {
   render() {
     let d = new Date();
     let begin = d.getTime();
-    this.renderer.render(this.scene, this.camera)
+    console.log("RENDER MATRIX VIS");
+    this.renderer.render(this.scene, this.camera);
     d = new Date();
     // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
   }
@@ -596,11 +608,11 @@ class MatrixVisualization {
     this.offset = offset;
     this.cellSize = cellSize;
 
+    console.log("UPDATE DATA MATRIX VIS!!")
+
     /* VERRR */
-    console.log(this.zoom);
-    console.log(typeof this.zoom);
-    this.zoom.scale(scale);
-    this.zoom.translate(tr);
+    this.zoom.scaleTo(this.view, scale); // here call to zoomed function
+    this.zoom.translateTo(this.view, tr); // here call to zoomed function again
 
     if (this.geometry) {
       this.scene.remove(this.mesh);
@@ -892,8 +904,9 @@ class MatrixVisualization {
     }
   }
   private mouseUpHandler = (e: Event) => {
+    console.log("MOUSEUP MATRIX VIS!!");
     this.mouseDown = false;
-    this.view.call(this.zoom);
+    this.view.call(this.zoom);//.on('zoom', this.zoomed));
     if (this.hoveredLinks)
       for (let id of this.hoveredLinks) {
         if (this.cellHighlightFrames[id])
@@ -906,17 +919,21 @@ class MatrixVisualization {
     console.log("click");
   }
   private zoomed = () => {
-    let z: number, tr: number[];
-    z = this.zoom.scale();
-    tr = this.zoom.translate();
+    let z: number, tr: number[] = [];
+    var transform: any = d3.zoomTransform(this.view.node());
+    z = transform.k;
+    tr[0] = transform.x;
+    tr[1] = transform.y;
+    console.log("ZOOMED MATRIX VIS!!");
     this.updateTransform(z, tr);
   }
 
   updateTransform(z: any, tr: any) {
     tr[0] = Math.min(0, tr[0]);
     tr[1] = Math.min(0, tr[1]);
-    this.zoom.scale(z);
-    this.zoom.translate(tr);
+    var transform: any = d3.zoomTransform(this.view.node());
+    z = transform.k;
+    console.log("UPDATE TRANSFORM MATRIX VIS!!");
     this.matrix.updateTransform(z, tr);
   }
 }
@@ -925,12 +942,12 @@ class MatrixVisualization {
 
 class Matrix {
 
-  private visualization: any; // BEFORE MatrixVisualization;
-  private labels: any; // BEFORE MatrixLabels;
-  private cellLabel: any; // BEFORE CellLabel = new CellLabel(); // error
-  private menu: any; // BEFORE MatrixMenu;
-  private timeSlider: any; // BEFORE MatrixTimeSlider;
-  private overview: any; // BEFORE MatrixOverview;
+  private visualization: MatrixVisualization | undefined = undefined;
+  private labels: MatrixLabels | undefined = undefined;
+  private cellLabel: CellLabel | undefined = undefined;
+  private menu: MatrixMenu | undefined = undefined;
+  private timeSlider: MatrixTimeSlider | undefined = undefined;
+  private overview: MatrixOverview | undefined = undefined;
   private _dgraph: dynamicgraph.DynamicGraph;
   private times: dynamicgraph.Time[];
   public startTime: dynamicgraph.Time;
@@ -978,7 +995,11 @@ class Matrix {
 
   getOverviewScale() {
     let totalNodes = this.dgraph.nodes().visible().length;
-    let cs = Math.min(this.visualization.height, this.visualization.width) / totalNodes;
+    let cs: number;
+    if (this.visualization)
+      cs = Math.min(this.visualization.height, this.visualization.width) / totalNodes;
+    else
+      cs = 0
     let scale = cs / this.initialCellSize;
     return scale;
   }
@@ -1003,25 +1024,32 @@ class Matrix {
     this.timeSlider = timeSlider;
   }
   updateOverviewImage(dataImg: any) {
-    this.overview.updateOverviewImage(dataImg);
+    if (this.overview)
+      this.overview.updateOverviewImage(dataImg);
   }
 
   hideCellLabel() {
-    this.cellLabel.hideCellLabel();
+    if (this.cellLabel)
+      this.cellLabel.hideCellLabel();
   }
 
   updateCellSize(value: number) {
+    console.log("UPDATE CELL SIZE MATRIX")
     let scale = value / this.initialCellSize;
     let tr = [this._tr[0] * scale / this._scale, this._tr[1] * scale / this._scale];
-    this.visualization.updateTransform(scale, tr);
+    if (this.visualization)
+      this.visualization.updateTransform(scale, tr);
   }
   resetTransform() {
+    console.log("RESET TRANSFORM MATRIX")
     let scale = this.getOverviewScale();
     this.createOverviewImage = true;
     this.updateTransform(scale, [0, 0]);
     this.createOverviewImage = false;
   }
+
   updateTransform(scale: any, tr: any) {
+    console.log("UPDATE TRANSFORM MATRIX")
     this._scale = scale;
     this._tr = tr;
     this._tr[0] = Math.min(this._tr[0], 0);
@@ -1067,13 +1095,10 @@ class Matrix {
         this.nodeOrder[nodes2[i].id()] = i;
       }
     } else if (orderType == 'similarity') {
-      console.log("SIMILARITY");
       let config: ordering.OrderingConfiguration = new ordering.OrderingConfiguration(this.startTime, this.endTime);
       config.nodes = this._dgraph.nodes().visible().toArray();
       config.links = this._dgraph.links().presentIn(this.startTime, this.endTime).visible().toArray();
-      console.log("ORDERING NODES");
       this.nodeOrder = ordering.orderNodes(this._dgraph, config);
-      console.log("FINISH");
     } else {
       let visibleNodes = this._dgraph.nodes().visible().toArray();
       this.nodeOrder = [];
@@ -1111,15 +1136,21 @@ class Matrix {
   updateVisibleBox() {
     this.bbox.x0 = -Math.floor(this._tr[0] / this._cellSize);
     this.bbox.y0 = -Math.floor(this._tr[1] / this._cellSize);
-    this.bbox.x1 = this.bbox.x0 + Math.floor(this.visualization.width / this._cellSize);
-    this.bbox.y1 = this.bbox.y0 + Math.floor(this.visualization.height / this._cellSize);
+    if (this.visualization) {
+      this.bbox.x1 = this.bbox.x0 + Math.floor(this.visualization.width / this._cellSize);
+      this.bbox.y1 = this.bbox.y0 + Math.floor(this.visualization.height / this._cellSize);
+    }
+    else {
+      this.bbox.x1 = this.bbox.x0;
+      this.bbox.y1 = this.bbox.y0;
+    }
 
     this.offset[0] = (this._tr[0] / this._cellSize + this.bbox.x0) * this._cellSize;
     this.offset[1] = (this._tr[1] / this._cellSize + this.bbox.y0) * this._cellSize;
   }
 
   updateVisibleData() {
-    // console.log("updateVis");
+    console.log("UPDATE VIS MATRIX");
     this.updateVisibleBox();
     let leftNodes = this.dgraph.nodes().visible().toArray();
     leftNodes = leftNodes.filter((d: any) =>
@@ -1150,13 +1181,18 @@ class Matrix {
         }
       }
     }
-    this.visualization.updateData(visibleData,
-      leftNodes.length, topNodes.length,
-      this.cellSize,
-      this.offset, this._scale, this._tr,
-      this.createOverviewImage);
+
+    if (this.visualization) {
+      console.log("CALL UPDATE MATRIX")
+      this.visualization.updateData(visibleData,
+        leftNodes.length, topNodes.length,
+        this.cellSize,
+        this.offset, this._scale, this._tr,
+        this.createOverviewImage);
+    }
 
     if (this.overview) {
+      console.log("OVERVIEW MATRIX")
       let totalNodes = this.dgraph.nodes().visible().length;
       let widthRatio = (this.bbox.x1 - this.bbox.x0) / totalNodes;
       let heightRatio = (this.bbox.y1 - this.bbox.y0) / totalNodes;
@@ -1189,7 +1225,8 @@ class Matrix {
       }
     }
     messenger.selection('add', <utils.ElementCompound>{ nodes: [d] });
-    this.labels.updateHighlightedNodes();
+    if (this.labels)
+      this.labels.updateHighlightedNodes();
   }
   highlightNodes(highlightedIds: number[]) {
     if (highlightedIds.length > 0) {
@@ -1201,7 +1238,8 @@ class Matrix {
   }
   updateCellLabel(linkId: number, mx: number, my: number) {
     if (linkId < 0) {
-      this.cellLabel.updateCellLabel(-1000, -1000, null, 0);
+      if (this.cellLabel)
+        this.cellLabel.updateCellLabel(-1000, -1000, null, 0);
       return;
     }
     let link = this._dgraph.link(linkId);
@@ -1210,12 +1248,14 @@ class Matrix {
       val = Math.round(val * 1000) / 1000;
       let z = this._scale;
       let fw = this.initialCellSize;
-      this.cellLabel.updateCellLabel(mx, my, val, fw);
+      if (this.cellLabel)
+        this.cellLabel.updateCellLabel(mx, my, val, fw);
     }
 
   }
   updateEvent = () => {
 
+    console.log("UPDATE EVENT MATRIX!!")
     let highlightedNodesIds = [];
     let highlightedLinksIds = [];
 
@@ -1251,11 +1291,16 @@ class Matrix {
 
     this.updateVisibleData();
 
-    this.labels.updateHighlightedNodes(highlightedNodesIds);
-    this.visualization.updateHighlightedLinks(highlightedLinksIds);
+    if (this.labels)
+      this.labels.updateHighlightedNodes(highlightedNodesIds);
+
+    if (this.visualization)
+      this.visualization.updateHighlightedLinks(highlightedLinksIds);
   }
 
   timeRangeHandler = (m: messenger.TimeRangeMessage) => {
+
+    console.log("TIME RANGE MATRIX")
 
     this.startTime = this.times[0];
     this.endTime = this.times[this.times.length - 1];
@@ -1274,7 +1319,8 @@ class Matrix {
     // this.startTime = this._dgraph.time(m.startId);
     // this.endTime = this._dgraph.time(m.endId);
     // this.timeSlider.set(this.startTime, this.endTime);
-    this.timeSlider.set(m.startUnix, m.endUnix);
+    if (this.timeSlider)
+      this.timeSlider.set(m.startUnix, m.endUnix);
 
     this.updateVisibleData();
   }
