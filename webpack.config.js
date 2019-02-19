@@ -2,7 +2,8 @@ const path = require('path');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
-    entry: './src/index.ts', // INDEX IS NEEDED?
+    mode: 'production',
+    entry: './src/index.ts',
     devtool: 'inline-source-map',
     plugins: [
         new CircularDependencyPlugin({
@@ -24,6 +25,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     output: {
+        library: 'vistorian',
         libraryTarget: "umd",
         filename: 'index.js',
         path: path.resolve(__dirname, 'lib')

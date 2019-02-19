@@ -8,12 +8,16 @@
         "build": "tsc --pretty false && webpack --config webpack.config.js",
         "lint": "tslint -p . -e 'package.json'",
         "clean": "rimraf lib",
-        "start": "webpack-dev-server --config webpack.config.js --open --global lib"
+        "start": "webpack-dev-server --config webpack.config.js --open"
     },
     "author": "Benjamin Bach <benj.bach@gmail.com>",
     "license": "MIT",
     "devDependencies": {
+        "@types/jstorage": "^0.3.30",
+        "@types/d3": "^3.0",
+        "@types/three": "^0.93.15",
         "@types/jquery": "^1.10.35",
+        "@types/papaparse": "^4.5.7",
         "rimraf": "^2.6.3",
         "ts-loader": "^5.3.3",
         "tslint": "^5.12.1",
@@ -33,19 +37,20 @@
     ],
     "homepage": "https://github.com/networkcube/networkcube#readme",
     "dependencies": {
-        "@types/d3": "^3.0",
-        "@types/three": "^0.93.15",
         "circular-dependency-plugin": "^5.0.2",
         "d3": "^3.0",
         "jquery": "^3.3.1",
         "jstorage": "^0.4.8",
         "lz-string": "^1.3.32",
-        "moment": "^2.24.0",
+        "moment": "^2.23.0",
         "papaparse": "^4.6.3",
         "three": "^0.100.0",
         "vistorian-bookmarkbrowser": "file:../vistorian-bookmarkbrowser",
         "vistorian-core": "file:../vistorian-core",
         "vistorian-nodelink": "file:../vistorian-nodelink",
+        "vistorian-matrix": "file:../vistorian-matrix",
+        "vistorian-map": "file:../vistorian-map",
+        "vistorian-dynamicego": "file:../vistorian-dynamicego",
         "vistorian-widgets": "file:../vistorian-widgets"
     }
 }

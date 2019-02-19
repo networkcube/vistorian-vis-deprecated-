@@ -21,8 +21,10 @@
         <script src="classes/utils.js"></script>-->
     <!-- VS: Call to trace_test_130529 -->
     <script type="text/javascript" src="./traces/trace_test_130529.js"></script>
-
-    <!--<script src="classes/vistorian.js"></script>-->
+    <script src="../lib/index.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.js" type="text/javascript"></script>
+    <script src="../build/vistorian.js"></script>
+    <script src="../build/storage.js"></script>
 
 
     <div id="main">
@@ -37,17 +39,15 @@
                 <a href="../web/nodelink.html?session=0&datasetName=demo_scientists" target="_blank">
                     <img class="visimage" src="./figures/nodelink.png" />
                 </a>
-                <!--
-                <a href="sites/dynamicego.html?session=0&datasetName=demo_scientists" target="_blank">
-                    <img class="visimage" src="figures/dynamicego.png" />
+                <a href="../web/dynamicego.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <img class="visimage" src="./figures/dynamicego.png" />
                 </a>
-                <a href="sites/matrix.html?session=0&datasetName=demo_scientists" target="_blank">
-                    <img class="visimage" src="figures/matrix.png" />
+                <a href="../web/matrix.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <img class="visimage" src="./figures/matrix.png" />
                 </a>
-                <a href="sites/map.html?session=0&datasetName=demo_scientists" target="_blank">
-                    <img class="visimage" src="figures/map.png" />
+                <a href="../web/map.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <img class="visimage" src="./figures/map.png" />
                 </a>
-                -->
             </div>
 
 
@@ -303,7 +303,7 @@
                 // $('#quickstartlink').attr('href', 'dataview.html?session=' + SESSION_NAME)
 
                 // set link to previous sesssion
-                var PREVIOUS_SESSION = storage.getLastSessionId();
+                var PREVIOUS_SESSION = '22'//getLastSessionId();
                 if (!PREVIOUS_SESSION || PREVIOUS_SESSION == '0' || PREVIOUS_SESSION == 0) {
                     PREVIOUS_SESSION = SESSION_NAME
                     console.log('create new session', PREVIOUS_SESSION)
@@ -336,8 +336,9 @@
                 // Load demo data
                 $.get("https://raw.githubusercontent.com/networkcube/vistorian/master/demo/demo_scientists.vistorian",
                     function (data) {
-                        vistorian.importData(JSON.parse(data), 0);
-                        vistorian.importIntoNetworkcube(JSON.parse(data), 0)
+                        console.log(data)
+                        importData(JSON.parse(data), 0);
+                        importIntoNetworkcube(JSON.parse(data), 0)
                     });
 
             </script>

@@ -1,6 +1,6 @@
-// <reference path="../scripts/jstorage.d.ts"/>
+/// <reference path="../node_modules/@types/jstorage/index.d.ts"/>
 
-import $ from 'jstorage';
+// import $ from 'jstorage';
 import * as vistorian from './vistorian';
 import * as main from 'vistorian-core/src/main';
 
@@ -33,12 +33,12 @@ export function getLastSessionId(): string {
 
 
 // Stores all user's tables (tables must be in json format)
-export function saveUserTable(table, sessionid: string) {
+export function saveUserTable(table: any, sessionid: string) {
     // console.log('[vistorian] Save user table', table.name, sessionid);
 
     // add name to table names if not yet there.
     var tableNames: string[] = getTableNames(sessionid);
-    var found = false;
+    var found: boolean = false;
     if (!tableNames) {
         tableNames = [];
     } else {
@@ -63,7 +63,7 @@ export function saveUserTable(table, sessionid: string) {
 // returns all users' tables
 export function getUserTables(sessionid: string): vistorian.VTable[] {
 
-    var tablenames: string[] = this.getTableNames(sessionid);
+    var tablenames: string[] = getTableNames(sessionid);
     var tables: vistorian.VTable[] = [];
     for (var i = 0; i < tablenames.length; i++) {
         tables.push($.jStorage.get<vistorian.VTable>(sessionid + SEP + SESSION_TABLE + SEP + tablenames[i]));
@@ -83,14 +83,14 @@ export function getTableNames(sessionid: string): string[] {
         names = []
     return names;
 }
-export function saveTableNames(tableNames, sessionid: string) {
+export function saveTableNames(tableNames: any, sessionid: string) {
     $.jStorage.set(sessionid + SEP + SESSION_TABLENAMES, tableNames);
 }
 export function deleteTable(table: vistorian.VTable, sessionid: string) {
     $.jStorage.deleteKey(sessionid + SEP + SESSION_TABLE + SEP + table.name);
 
     var tableNames: string[] = getTableNames(sessionid);
-    var found = false;
+    var found: boolean = false;
     if (!tableNames) {
         tableNames = [];
     } else {
@@ -120,7 +120,7 @@ export function saveNetwork(network: vistorian.Network, sessionid: string) {
 
     // add name to table names if not yet there.
     var networkIds: number[] = getNetworkIds(sessionid);
-    var found = false;
+    var found: boolean = false;
     if (!networkIds) {
         networkIds = [];
     } else {
@@ -146,7 +146,7 @@ export function getNetworkIds(sessionid: string): number[] {
     // console.log('getNetworkIds :', sessionid, ids)
     return ids;
 }
-export function saveNetworkIds(networkIds, sessionid: string) {
+export function saveNetworkIds(networkIds: any, sessionid: string) {
     $.jStorage.set(sessionid + SEP + SESSION_NETWORKIDS, networkIds);
 }
 
@@ -168,8 +168,8 @@ export function deleteNetworkById(id: number, sessionid: string) {
     $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + id, {});
     $.jStorage.deleteKey(sessionid + SEP + SESSION_NETWORK + SEP + id);
 
-    var networkIds = getNetworkIds(sessionid);
-    var found = false;
+    var networkIds: number[] = getNetworkIds(sessionid);
+    var found: boolean = false;
     if (!networkIds) {
         networkIds = [];
     } else {

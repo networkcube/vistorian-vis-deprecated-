@@ -17,12 +17,15 @@
 
         <script src="../lib/index.js"></script>
         <script src="../node_modules/vistorian-core/lib/vistorian-core.js"></script>
+
     </head>
-    <title>Node link</title>
+    <title>Map</title>
 
 <body>
+
     <!-- VS: Call to trace_test_130529 -->
     <script type="text/javascript" src="./traces/trace_test_130529.js"></script>
+
     <table>
         <tr>
             <td width="220px">
@@ -42,23 +45,7 @@
         © 2016 Microsoft <img src="./logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img
             src="./logos/logo-inria.png" height="20px">
     </div>
-
     <script>
-        function setHeader(elementId, datasetname) {
-            var header = $('<a href="../index.html"><img width="100%" src="./logos/logo-networkcube.png"/></a>')
-            $('#' + elementId).append(header);
-            var dataname = $('\
-        <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname + '</h2>')
-            $('#' + elementId).append(dataname);
-
-            var vars = getUrlVars();
-
-            // VS: Clicks on Return to DataView
-            // trace.event("system", "ts_ReturnDV", "CCC", "DDD");
-            $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(\'system\', \'ts_ReturnDV\', \'CCC\', \'DDD\');" target="_blank">Return to Dataview</a>');
-            $('#' + elementId).append('<br/><br/>');
-        }
-
         if (window.location.port)
             SERVER = location.protocol + '//' + window.location.hostname + ':' + window.location.port + '' + window.location.pathname + '/';
         else
@@ -75,24 +62,21 @@
 
             var params = getUrlVars();
             params['datasetName'] = params['datasetName'].replace(/___/g, ' ');
-
+            
             console.log(params)
-
+            
             createVisualizationIFrame(
                 'bookmarkFrame',
                 SERVER + '../node_modules/vistorian-bookmarkbrowser/web/index.html',
                 params['session'], params['datasetName'],
-                width_col1, height);
-
+                width_col1, height)
             createVisualizationIFrame(
                 'visFrame',
-                SERVER + '../node_modules/vistorian-nodelink/web/index.html',
+                SERVER + '../node_modules/vistorian-map/web/index.html',
                 params['session'], params['datasetName'],
-                width_col2, height);
+                width_col2, height)
 
-
-            setHeader('logoFrame', params['datasetName']);
-
+            //vistorian.setHeader('logoFrame', params['datasetName']);
         });
     </script>
 </body>
