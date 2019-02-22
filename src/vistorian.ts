@@ -4,20 +4,9 @@ and the user data.
 This API should be used in every visualization.
 */
 
-// function vistorian(){
-
-// 	function getSchema(tableName){
-// 		// return getUrlVars()[tableName]
-// 	 //        .replace('[', '')
-// 	 //        .replace(']', '')
-// 	 //        .split(',')
-// 	  var schema = getUrlVars()['schema']
-// 	  schema = schema.replace(/%22/g, '"').replace(/%20/g, '_')
-// 	  schema = JSON.parse(schema);
-// 	  return schema;
-// 	}
-// }
-// LOADING FONTS:
+import * as datamanager from 'vistorian-core/src/datamanager';
+import * as utils from 'vistorian-core/src/utils';
+import * as main from 'vistorian-core/src/main';
 
 import $ from 'jquery';
 import * as Papa from 'papaparse';
@@ -25,9 +14,6 @@ import * as moment from 'moment';
 
 import * as storage from './storage';
 
-import * as datamanager from 'vistorian-core/src/datamanager';
-import * as utils from 'vistorian-core/src/utils';
-import * as main from 'vistorian-core/src/main';
 
 var head: any = $('head');
 head.append("<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300italic,700,300&subset=latin,latin-ext' rel='stylesheet' type='text/css'></head>")
@@ -80,6 +66,7 @@ export class VNodeSchema extends VTableSchema {
         super('userNodeSchema')
     };
 }
+
 export class VLinkSchema extends VTableSchema {
     location_source: number = -1; // location of source node
     location_target: number = -1; // location of target node
@@ -478,18 +465,20 @@ export function importData(network: Network, session: any) {
     storage.saveNetwork(network, session);
 }
 
-
-
 export function importIntoNetworkcube(currentNetwork: Network, sessionid: string, s: boolean) {
     currentNetwork.ready = false;
 
-    var userLinkSchema: VLinkSchema = new VLinkSchema();
+    //var userLinkSchema: VLinkSchema = new VLinkSchema();
     if (currentNetwork.userLinkSchema) {
-        userLinkSchema = currentNetwork.userLinkSchema;
+        var userLinkSchema: VLinkSchema = currentNetwork.userLinkSchema;
+    } else {
+        var userLinkSchema: VLinkSchema = new VLinkSchema();
     }
-    var userNodeSchema: VNodeSchema = new VNodeSchema();
+    //var userNodeSchema: VNodeSchema;//VNodeSchema = new VNodeSchema();
     if (currentNetwork.userNodeSchema) {
-        userNodeSchema = currentNetwork.userNodeSchema;
+        var userNodeSchema: VNodeSchema = currentNetwork.userNodeSchema;
+    } else {
+        var userNodeSchema: VNodeSchema = new VNodeSchema();
     }
 
     // check minimal conditions to create and import a network
@@ -524,36 +513,33 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
     var normalizedLinkTable: any[] = [];
 
     // get standard schemas
-    var normalizedNodeSchema: datamanager.NodeSchema;
-    var normalizedLinkSchema: datamanager.LinkSchema;
-
-
-    // INITIALZE NORMALIZED SCHEMAS WITH USER'S ATTRIBUTES
-
     // INIT NODE SCHEMA
-    normalizedNodeSchema = new datamanager.NodeSchema(0);
-
+    var normalizedNodeSchema: datamanager.NodeSchema = new datamanager.NodeSchema(0);;
+    
+    
+    // INITIALZE NORMALIZED SCHEMAS WITH USER'S ATTRIBUTES
+    
     // required attributes
     normalizedNodeSchema.id = 0;
     normalizedNodeSchema.label = 1;
-
+    
     var nodeColCount: number = 2
     if (currentNetwork.userNodeSchema) {
         for (var p in currentNetwork.userNodeSchema) {
             if (currentNetwork.userNodeSchema.hasOwnProperty(p)
-                && (currentNetwork.userNodeSchema as any)[p] > -1
-                && p != 'id'
-                && p != 'label'
-                && p != 'relation'
-                && (currentNetwork.userNodeSchema as any)[p].length > 0
+            && (currentNetwork.userNodeSchema as any)[p] > -1
+            && p != 'id'
+            && p != 'label'
+            && p != 'relation'
+            && (currentNetwork.userNodeSchema as any)[p].length > 0
             ) {
                 (normalizedNodeSchema as any)[p] = nodeColCount++;
             }
         }
     }
-
+    
     // INIT LINK SCHEMA
-    normalizedLinkSchema = new datamanager.LinkSchema(0, 1, 2);
+    var normalizedLinkSchema: datamanager.LinkSchema = new datamanager.LinkSchema(0, 1, 2);
     // required attributes
     normalizedLinkSchema.id = 0;
     normalizedLinkSchema.source = 1;

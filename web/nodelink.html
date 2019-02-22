@@ -14,8 +14,11 @@
         <script type="text/javascript" src="./traces/trace.js"></script>
 
         <script src="../node_modules/jquery/dist/jquery.js" type="text/javascript"></script>
+        <script src="../node_modules/jstorage/jstorage.min.js"></script>
 
-        <script src="../lib/index.js"></script>
+        <script src="./static/science.js"></script>
+
+        <script> var exports = {}; </script>
         <script src="../node_modules/vistorian-core/lib/vistorian-core.js"></script>
     </head>
     <title>Node link</title>
@@ -43,22 +46,8 @@
             src="./logos/logo-inria.png" height="20px">
     </div>
 
+    <script src="../lib/vistorian-vis.js"></script>
     <script>
-        function setHeader(elementId, datasetname) {
-            var header = $('<a href="../index.html"><img width="100%" src="./logos/logo-networkcube.png"/></a>')
-            $('#' + elementId).append(header);
-            var dataname = $('\
-        <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname + '</h2>')
-            $('#' + elementId).append(dataname);
-
-            var vars = getUrlVars();
-
-            // VS: Clicks on Return to DataView
-            // trace.event("system", "ts_ReturnDV", "CCC", "DDD");
-            $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(\'system\', \'ts_ReturnDV\', \'CCC\', \'DDD\');" target="_blank">Return to Dataview</a>');
-            $('#' + elementId).append('<br/><br/>');
-        }
-
         if (window.location.port)
             SERVER = location.protocol + '//' + window.location.hostname + ':' + window.location.port + '' + window.location.pathname + '/';
         else
@@ -91,7 +80,7 @@
                 width_col2, height);
 
 
-            setHeader('logoFrame', params['datasetName']);
+            //setHeader('logoFrame', params['datasetName']);
 
         });
     </script>

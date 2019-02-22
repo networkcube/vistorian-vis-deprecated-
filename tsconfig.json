@@ -3,7 +3,7 @@
         "outDir": "./build/",
         "target": "es6",
         "module": "es2015",
-        //"sourceMap": true,
+        "sourceMap": true,
         "strict": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -12,10 +12,8 @@
         "declaration": true
     },
     "pretty": false,
-    "files": [
-        "./src/dataview.ts",
-        "./src/storage.ts",
-        "./src/utils.ts",
-        "./src/vistorian.ts"
+    "files": ["src/index.ts"],
+    "include": [
+        "src/**/*.ts"
     ]
 }
