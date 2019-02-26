@@ -300,7 +300,7 @@
                 // $('#quickstartlink').attr('href', 'dataview.html?session=' + SESSION_NAME)
 
                 // set link to previous sesssion
-                var PREVIOUS_SESSION = '1111'//getLastSessionId();
+                var PREVIOUS_SESSION = window.exports.networkcube.storage.getLastSessionId();
                 if (!PREVIOUS_SESSION || PREVIOUS_SESSION == '0' || PREVIOUS_SESSION == 0) {
                     PREVIOUS_SESSION = SESSION_NAME
                     console.log('create new session', PREVIOUS_SESSION)
@@ -315,9 +315,9 @@
                 // Load demo data
                 $.get("https://raw.githubusercontent.com/networkcube/vistorian/master/demo/demo_scientists.vistorian",
                     function (data) {
-                        importData(JSON.parse(data), 0);
+                        window.exports.networkcube.vistorian.importData(JSON.parse(data), 0);
                         console.log(data)
-                        importIntoNetworkcube(JSON.parse(data), 0)
+                        window.exports.networkcube.vistorian.importIntoNetworkcube(JSON.parse(data), 0)
                     });
 
             </script>

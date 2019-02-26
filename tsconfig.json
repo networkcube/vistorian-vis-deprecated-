@@ -12,8 +12,10 @@
         "declaration": true
     },
     "pretty": false,
-    "files": ["src/index.ts"],
-    "include": [
-        "src/**/*.ts"
+    "files": [
+        "src/dataview.ts",
+        "src/storage.ts",
+        "src/utils.ts",
+        "src/vistorian.ts"
     ]
 }

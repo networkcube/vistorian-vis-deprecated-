@@ -63,9 +63,9 @@
 
             var params = getUrlVars();
             params['datasetName'] = params['datasetName'].replace(/___/g, ' ');
-            
+
             console.log(params)
-            
+
             createVisualizationIFrame(
                 'bookmarkFrame',
                 SERVER + '../node_modules/vistorian-bookmarkbrowser/web/index.html',
@@ -77,7 +77,7 @@
                 params['session'], params['datasetName'],
                 width_col2, height)
 
-            //vistorian.setHeader('logoFrame', params['datasetName']);
+            window.exports.networkcube.vistorian.vistorian.setHeader('logoFrame', params['datasetName']);
         });
     </script>
 </body>

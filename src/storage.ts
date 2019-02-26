@@ -11,6 +11,7 @@ var SESSION_SESSIONID: string = "vistorian.lastSessionId";
 var SEP: string = "#";
 
 
+console.log(SEP);
 // SESSION
 export function saveSessionId(sessionid: string) {
     // console.log('save session', sessionid )
@@ -22,7 +23,6 @@ export function getLastSessionId(): string {
     // console.log('get session, ', session)
     return session;
 }
-
 
 
 //////////////
