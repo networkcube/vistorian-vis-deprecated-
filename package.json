@@ -36,6 +36,7 @@
     "homepage": "https://github.com/networkcube/networkcube#readme",
     "dependencies": {
         "circular-dependency-plugin": "^5.0.2",
+        "d3": "^3.4",
         "datatables.net": "^1.10.19",
         "express": "^4.16.4",
         "jquery": "^3.3.1",

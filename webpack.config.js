@@ -3,9 +3,9 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 //const webpack = require('webpack');
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: './src/index.ts',
-    devtool: 'inline-source-map',
+    devtool: false,
     plugins: [
         new CircularDependencyPlugin({
             exclude: /a\.js|node_modules/,

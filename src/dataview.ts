@@ -67,7 +67,7 @@ export function loadVisualizationList() {
         $('#visualizationList')
             .append('<li class="visLink" title="Show ' + v[0] + ' visualization.">\
                         <button onclick="loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip">\
-                            <img src="figures/' + v[1] + '.png" class="visicon"/>\
+                            <img src="../figures/' + v[1] + '.png" class="visicon"/>\
                             <p>' + v[0] + '</p>\
                         </button>\
                     </li>')
@@ -75,12 +75,12 @@ export function loadVisualizationList() {
     $('#visualizationList')
         .append('<li class="visLink" title="Show matrix and node-link split-view.">\
             <button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip">\
-            <img src="figures/nl+mat.png" class="visicon"/><p>Matrix + Node Link</p>\
+            <img src="../figures/nl+mat.png" class="visicon"/><p>Matrix + Node Link</p>\
         </button></li>')
     $('#visualizationList')
         .append('<li class="visLink" title="Show all visualizations.">\
         <button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip">\
-        <img src="figures/all.png" class="visicon"/><p>All</p>\
+        <img src="../figures/all.png" class="visicon"/><p>All</p>\
         </button></li>')
 }
 
@@ -96,7 +96,7 @@ export function loadTableList() {
             shownName = t.substring(0, 30) + '..';
         $('#tableList').append('<li>\
             <a onclick="showSingleTable(\'' + t + '\')"  class="underlined">' + shownName + '.csv</a>\
-            <img class="controlIcon" title="Delete this table." src="logos/delete.png" onclick="removeTable(\''+ t + '\')"/>\
+            <img class="controlIcon" title="Delete this table." src="../logos/delete.png" onclick="removeTable(\''+ t + '\')"/>\
         </li>')
     })
 }
@@ -112,8 +112,8 @@ export function loadNetworkList() {
         $('#networkList').append('\
             <li>\
                 <a onclick="showNetwork(\'' + network.id + '\')"  class="underlined">' + network.name + '</a>\
-                <img class="controlIcon" title="Delete this network." src="logos/delete.png" onclick="removeNetwork(\''+ network.id + '\')"/>\
-                <img class="controlIcon" title="Download this network in .vistorian format." src="logos/download.png" onclick="exportNetwork(\''+ network.id + '\')"/>\
+                <img class="controlIcon" title="Delete this network." src="../logos/delete.png" onclick="removeNetwork(\''+ network.id + '\')"/>\
+                <img class="controlIcon" title="Download this network in .vistorian format." src="../logos/download.png" onclick="exportNetwork(\''+ network.id + '\')"/>\
             </li>')
     })
 }
@@ -585,7 +585,7 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
                         if (currentNetwork.hasOwnProperty('timeFormat')) {
                             val = "value='" + currentNetwork.timeFormat + "'";
                         }
-                        timeFormatInput = $('<span class="nobr"><input title="Enter a date pattern" type="text" size="12" id="timeFormatInput_' + schema.name + '" placeholder="DD/MM/YYYY" ' + val + ' onkeyup="timeFormatChanged()"></input><a href="http://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Details of the date pattern syntax"><img src="logos/help.png" class="inlineicon"/></a></span>');
+                        timeFormatInput = $('<span class="nobr"><input title="Enter a date pattern" type="text" size="12" id="timeFormatInput_' + schema.name + '" placeholder="DD/MM/YYYY" ' + val + ' onkeyup="timeFormatChanged()"></input><a href="http://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Details of the date pattern syntax"><img src="../logos/help.png" class="inlineicon"/></a></span>');
                         cell.append(timeFormatInput);
                     }
                 }
