@@ -3,9 +3,10 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 //const webpack = require('webpack');
 
 module.exports = {
+    target: 'web',
     mode: 'production',
     entry: './src/index.ts',
-    devtool: false,
+    devtool: 'inline-source-map',
     plugins: [
         new CircularDependencyPlugin({
             exclude: /a\.js|node_modules/,
@@ -24,6 +25,9 @@ module.exports = {
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
+    },
+    devServer: {
+        contentBase: './'
     },
     output: {
         library: "networkcube",
