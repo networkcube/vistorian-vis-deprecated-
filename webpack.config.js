@@ -5,7 +5,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 module.exports = {
     target: 'web',
     mode: 'production',
-    entry: './src/index.ts',
+    /*entry: './src/index.ts',
     devtool: 'inline-source-map',
     plugins: [
         new CircularDependencyPlugin({
@@ -25,14 +25,14 @@ module.exports = {
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
-    },
+    },*/
     devServer: {
         contentBase: './'
-    },
+    }/*,
     output: {
         library: "networkcube",
         libraryTarget: "umd",
         filename: 'vistorian-vis.js',
         path: path.resolve(__dirname, 'lib')
-    }
+    }*/
 };

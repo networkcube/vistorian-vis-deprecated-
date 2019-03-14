@@ -6,7 +6,7 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <title>Data view</title>
     <!-- VS: Call to trace.js -->
-    <script type="text/javascript" src="./traces/trace.js"></script>
+    <script type="text/javascript" src="../static/traces/trace.js"></script>
 
     <link rel="stylesheet" type="text/css" href="./static/styles.css" />
     <link rel="stylesheet" type="text/css" href="./static/dataview_styles.css" />
@@ -23,12 +23,12 @@
 
 <body>
     <!-- VS: Call to trace_test_130529 -->
-    <script type="text/javascript" src="./traces/trace_test_130529.js"></script>
+    <script type="text/javascript" src="../static/traces/trace_test_130529.js"></script>
 
     <table id="main">
         <tr id="firstRow">
             <td id="menu">
-                <a href="../index/index.html"><img width="100%" src="../logos/logo-networkcube.png" /></a>
+                <a href="../index/index.html"><img width="100%" src="../static/logos/logo-networkcube.png" /></a>
                 <p id="intro">
                     This is your data view. Below you find a list of visualizations and the
                     networks currently in your browser.
@@ -168,23 +168,6 @@
                     </div>
                     <div id="individualTable"></div>
                 </div>
-
-
-                <!-- <div id="chooseNetworktype" style="display:none;">
-                    <h2>Create new network</h2>
-                    <p>Which of the below form has your data?</p>
-
-                    <h3>a) Node-Table Format:</h3>
-                    <img src="figures/node-table.png" alt="" class="tablePic" onclick="setNetworkConfig('node')">
-                    <br/>
-                    <br/>
-                    <h3>b) Link-Table Format:</h3>
-                    <img src="figures/link-table.png" alt="" class="tablePic" onclick="setNetworkConfig('link')">
-                    <br/>
-                    <br/>
-                    <h3>c) Node- and Link-Table Format:</h3>
-                    <img src="figures/both-table.png" alt="" class="tablePic" onclick="setNetworkConfig('both')">
-                </div> -->
             </td>
         </tr>
     </table>
@@ -196,8 +179,8 @@
         <a class="footer" href="https://go.microsoft.com/fwlink/?LinkId=521839" title="privacy">Privacy & Cookies</a> |
         <a class="footer" href="https://go.microsoft.com/fwlink/?LinkID=760869" title="terms of use">Terms Of Use</a> |
         <a class="footer" href="http://go.microsoft.com/fwlink/?LinkId=506942" title="trademarks">Trademarks</a>
-        © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img
-            src="../logos/logo-inria.png" height="20px">
+        © 2016 Microsoft <img src="../static/logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img
+            src="../static/logos/logo-inria.png" height="20px">
     </div>
 
 
@@ -206,7 +189,7 @@
     <script src="../node_modules/jstorage/jstorage.js"></script>
     
     <script> var exports = {}; </script>
-    <script src="../lib/vistorian-vis.js"></script>
+    <script src="../node_modules/vistorian-vis/lib/vistorian-vis.js"></script>
 
     <!-- VER ESTO -->
     <script>
