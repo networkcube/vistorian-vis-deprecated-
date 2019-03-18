@@ -401,7 +401,7 @@ export function cleanTable(table: any[][]) {
 
 
 export function setHeader(elementId: String, datasetname: String) {
-    var header: any = $('<a href="../index.html"><img width="100%" src="../logos/logo-networkcube.png"/></a>')
+    var header: any = $('<a href="../index.html"><img width="100%" src="../static/logos/logo-networkcube.png"/></a>')
     $('#' + elementId).append(header);
     var dataname: any = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname + '</h2>')
