@@ -4,7 +4,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
     target: 'web',
-    mode: 'production',
+    mode: 'development',
     entry: './src/index.ts',
     devtool: 'inline-source-map',
     externals: {
