@@ -5,7 +5,7 @@
     "scripts": {
         "lint": "tslint -p . -e 'package.json'",
         "clean": "rimraf lib",
-        "start": "webpack-dev-server --open"
+        "start": "webpack-dev-server --config webpack.config.js --open"
     },
     "author": "Benjamin Bach <benj.bach@gmail.com>",
     "license": "MIT",
@@ -33,6 +33,7 @@
     "homepage": "https://github.com/networkcube/networkcube#readme",
     "dependencies": {
         "circular-dependency-plugin": "^5.0.2",
+        "html-loader": "^0.5.5",
         "jquery": "^3.3.1",
         "jstorage": "^0.4.8",
         "moment": "^2.23.0",
@@ -43,7 +44,7 @@
         "vistorian-map": "file:../vistorian-map",
         "vistorian-matrix": "file:../vistorian-matrix",
         "vistorian-nodelink": "file:../vistorian-nodelink",
-        "vistorian-widgets": "file:../vistorian-widgets",
-        "vistorian-vis": "file:../vistorian-vis"
+        "vistorian-vis": "file:../vistorian-vis",
+        "vistorian-widgets": "file:../vistorian-widgets"
     }
 }
