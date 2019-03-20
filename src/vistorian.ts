@@ -25,7 +25,6 @@ head.append("<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel=
 head.append("<link href='https://fonts.googleapis.com/css?family=Caveat' rel='stylesheet' type='text/css'>")
 head.append("<link href='https://fonts.googleapis.com/css?family=IM+Fell+English' rel='stylesheet' type='text/css'>")
 
-// append('./lib/xml2json.js');
 function append(url: string) {
     var script: any = document.createElement('script');
     script.type = 'text/javascript';
@@ -117,9 +116,6 @@ export class Network {
     }
 }
 
-
-
-
 // FUNCTIONS
 
 export function loadCSV(files: File[], callBack: Function, sessionid: string) {
@@ -130,8 +126,6 @@ export function loadCSV(files: File[], callBack: Function, sessionid: string) {
     var fileContents: any[] = []
     var readers: FileReader[] = [];
     for (var i = 0, f: File; f = files[i]; i++) {
-        // f.name = f.name.replace(/\s/g, '_');
-        console.log('f.name: ', f.name)
         var reader: FileReader = new FileReader();
         (reader as any).filename = f.name.replace(/\s/g, '_').split('_')[0];
         readers[i] = reader;
@@ -158,15 +152,12 @@ export function loadCSV(files: File[], callBack: Function, sessionid: string) {
                     // }
                 ).data
             )
-            // console.log('>', table.data[59])
-
             // remove white spaces, extra cols and rows etc..
             formatTable(table);
 
             storage.saveUserTable(table, sessionid);
             loadCount++;
 
-            // console.log(loadCount, files.length);
             if (loadCount == files.length)
                 callBack();
         }
@@ -175,7 +166,6 @@ export function loadCSV(files: File[], callBack: Function, sessionid: string) {
 }
 
 export function exportTableCSV(table: VTable) {
-    // console.log(table.data);
     var csv: any = Papa.unparse(table.data, { quotes: true });
     var textFileAsBlob: Blob = new Blob([csv], { type: 'text/csv' });
     var fileNameToSaveAs: string = table.name + '.csv';
@@ -210,11 +200,6 @@ export function formatTable(table: VTable) {
             || table.data[0][0] == 'Index'
             || table.data[0][0].includes('index')
             || table.data[0][0].includes('Index'));
-    // var indexify = false;
-    // test
-    // if(Number(table.data[1][0]) == NaN){
-    // 	indexify = true;
-    // }	
 
     var numCols: number = table.data[0].length;
     var emptyCols: number = 0;
@@ -258,7 +243,6 @@ export function formatTable(table: VTable) {
 export function checkTime(table: VTable, timeCol: number, timeFormat: string): number[] {
     var timeString: string;
     var error: number[] = [];
-    // console.log('table', table)
     for (var i = 0; i < table.data.length; i++) {
         timeString = table.data[i][timeCol];
 
@@ -274,118 +258,6 @@ export function checkTime(table: VTable, timeCol: number, timeFormat: string): n
     }
     return error;
 }
-
-
-
-// function updateEntryToLocationTable(index: number, geoname: string, locationTable: VTable, locationSchema: networkcube.LocationSchema) {
-//     return updateEntryToLocationTableOSM(index, geoname, locationTable, locationSchema);
-// }
-
-/// [bbach]: function deprecated since switched to open-street-map webservice.
-// function updateEntryToLocationTableDariah(index: number, geoname: string, locationTable: VTable, locationSchema: networkcube.LocationSchema) {
-//     geoname = geoname.trim();
-//     fullGeoNames.push(geoname);
-//     // get coordinates for name: 
-//     console.log('url', "http://ref.dariah.eu/tgnsearch/tgnquery2.xql?ac=" + geoname.split(',')[0].trim())
-//     var xhr = $.ajax({
-//         url: "http://ref.dariah.eu/tgnsearch/tgnquery2.xql?ac=" + geoname.split(',')[0].trim(),
-//         dataType: 'xml'
-//     })
-//         .done(function(data, text, XMLHttpRequest) {
-//             var data = x2js.xml2json(data);
-//             var entry;
-//             var length;
-//             var rowIndex = XMLHttpRequest.uniqueId + 1;
-
-//             var userLocationLabel = locationTable.data[rowIndex][locationSchema.label];
-//             if (data.response.term != undefined) {
-
-//                 // get all results
-//                 var validResults = []
-//                 var result;
-
-//                 // console.log('data.response.term',data.response.term)
-//                 if (data.response.term[0] != undefined) {
-//                     for (var i = 0; i < data.response.term.length; i++) {
-//                         entry = data.response.term[i];
-//                         if (entry == undefined)
-//                             continue;
-//                         if (entry.longitude != undefined
-//                             && entry.latitude != undefined
-//                             && typeof entry.longitude == 'string'
-//                             && typeof entry.latitude == 'string'
-//                         ) {
-//                             validResults.push(entry);
-//                         }
-//                     }
-//                 } else {
-//                     validResults.push(data.response.term);
-//                 }
-
-
-//                 // if no results returned, save the user location name and return;
-//                 if (validResults.length == 0) {                    // no value
-//                     locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-//                     return;
-//                 }
-
-
-//                 if (validResults.length == 1) {
-//                     // if only one valid result has been returned, add this single result
-//                     // locationTable.data.push([locationTable.data.length-1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude])	
-//                     locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude];
-//                     return;
-//                 }
-//                 else {
-//                     // look for specification in the user input that matches the geographical hiearachy of the result
-//                     console.log('multiple results found')
-//                     // trim user specifications
-//                     var geonameAttributes = fullGeoNames[rowIndex - 1];
-//                     geonameAttributes = geonameAttributes.split(',');
-//                     for (var j = 0; j < geonameAttributes.length; j++) {
-//                         geonameAttributes[j] = geonameAttributes[j].trim();
-//                     }
-
-//                     var regionTerms;
-//                     // look for every valid result
-//                     for (var i = 0; i < validResults.length; i++) {
-//                         regionTerms = validResults[i].path.split('|');
-
-//                         // trim result terms
-//                         for (var j = 0; j < regionTerms.length; j++) {
-//                             regionTerms[j] = regionTerms[j].trim();
-//                         }
-
-//                         // do terms match?
-//                         if (geonameAttributes.length > 1 && regionTerms.length > 1) {
-//                             for (var j = 1; j < geonameAttributes.length; j++) {
-//                                 for (var k = 1; k < regionTerms.length; k++) {
-//                                     if (geonameAttributes[j] == regionTerms[k]) {
-//                                         locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[i].longitude, validResults[i].latitude];
-//                                         console.log('update', geoname, validResults[i].longitude, validResults[i].latitude);
-//                                         return;
-//                                     }
-//                                 }
-//                             }
-//                         }
-//                     }
-//                     locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude];
-//                     console.log('update', geoname, validResults[0].longitude, validResults[0].latitude);
-//                 }
-//             } else {
-//                 // if answer is valid, means that webservice didn't find that name. 
-//                 if (geoname == '')
-//                     return;
-//                 locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-//                 console.log('update', geoname, undefined, undefined);
-//             }
-//         })
-//         .always(function() {
-//             requestsRunning--;
-//         });
-//     xhr['uniqueId'] = requestsRunning++;
-// }
-
 
 export function cleanTable(table: any[][]) {
     // trim entries
@@ -410,46 +282,12 @@ export function setHeader(elementId: String, datasetname: String) {
     var vars: any = utils.getUrlVars();
 
     // VS: Clicks on Return to DataView
-    // trace.event("system", "ts_ReturnDV", "CCC", "DDD");
     $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(\'system\', \'ts_ReturnDV\', \'CCC\', \'DDD\');" target="_blank">Return to Dataview</a>');
     $('#' + elementId).append('<br/><br/>');
 }
 
 
 export function exportNetwork(network: Network) {
-
-    // // CONVERT NODES
-    // var nodeTable = network.networkCubeDataSet.nodeTable;
-    // var nodeSchema = network.networkCubeDataSet.nodeSchema;
-    // var nodes = [];
-    // var n;
-    // for(var i=0 ; i <nodeTable.length ; i++){
-    //     n = new Object();
-    //     for( var prop in nodeSchema){
-    //         if(!prop.startsWith('name') && nodeSchema[prop] != null)
-    //             n[prop] = nodeTable[i][nodeSchema[prop]]                
-    //     }
-    //     nodes.push(n)
-    // }
-
-    // // CONVERT LINKS
-    // var linkTable = network.networkCubeDataSet.linkTable;
-    // var linkSchema = network.networkCubeDataSet.linkSchema;
-    // var links = [];
-    // var n;
-    // for(var i=0 ; i <linkTable.length ; i++){
-    //     n = new Object();
-    //     for( var prop in linkSchema){
-    //         if(!prop.startsWith('name') && linkSchema[prop] != null)
-    //             n[prop] = linkTable[i][linkSchema[prop]]                
-    //     }
-    //     links.push(n)
-    // }
-    // var blurb = {
-    //     nodes:nodes, 
-    //     links:links
-    // }
-
     var blurb: Network = network;
 
     var element: any = document.createElement('a');
@@ -468,13 +306,12 @@ export function importData(network: Network, session: any) {
 export function importIntoNetworkcube(currentNetwork: Network, sessionid: string, s: boolean) {
     currentNetwork.ready = false;
 
-    //var userLinkSchema: VLinkSchema = new VLinkSchema();
     if (currentNetwork.userLinkSchema) {
         var userLinkSchema: VLinkSchema = currentNetwork.userLinkSchema;
     } else {
         var userLinkSchema: VLinkSchema = new VLinkSchema();
     }
-    //var userNodeSchema: VNodeSchema;//VNodeSchema = new VNodeSchema();
+
     if (currentNetwork.userNodeSchema) {
         var userNodeSchema: VNodeSchema = currentNetwork.userNodeSchema;
     } else {
@@ -562,12 +399,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
 
     }
 
-
-    console.log('NORMALIZED NODE SCHEMA: ', normalizedNodeSchema)
-    console.log('NORMALIZED LINK SCHEMA: ', normalizedLinkSchema)
-
-
-
     //  EXTRACT LOCATIONS FROM USER LOCATION TABLE, IF PRESENT
 
     var locationLabels: string[] = [];
@@ -586,7 +417,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
     if (currentNetwork.userLinkTable == undefined
         && currentNetwork.userNodeTable != undefined) {
         // create link table and fill
-        // console.log('nodeData', nodeData)
         var id: number;
         var relCol: number;
         var newNodeRow: any[];
@@ -594,25 +424,11 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         var rowNum: number;
         var userNodeTable: any[] = currentNetwork.userNodeTable.data;
 
-        // networkcubeLinkSchema = new networkcube.LinkSchema(0, 1, 2)
         var colCount: number = 3
         normalizedLinkSchema.linkType = colCount++;
         if (datamanager.isValidIndex(userNodeSchema.time)) {
             normalizedLinkSchema.time = colCount++;
         }
-
-        // if(networkcube.isValidIndex(userNodeSchema.time))
-        // {
-        //     normalizedNodeSchema.time = colCount++;
-        // }
-        // if(networkcube.isValidIndex(userNodeSchema.nodeType))
-        // {
-        //     normalizedNodeSchema.nodeType = colCount++;
-        // }
-        // if(networkcube.isValidIndex(userNodeSchema.location))
-        // {
-        //     normalizedNodeSchema.location = colCount++;
-        // }
 
         // In the normalized node table, create one row for each row in the node table, 
         // if name does not already exists
@@ -628,7 +444,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             normalizedNodeTable.push(newRow);
         }
 
-        // console.log('Create new links: ' + (nodeData.length * nodeSchema.relation.length), nodeData, nodeSchema.relation)
         // create a node row for each node in a relation field 
         // that does not yet has an entry in the node table.
         // Plus, create a link in the link table.
@@ -638,7 +453,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             var row: any;
             var sourceId: number;
             var targetId: number;
-            // console.log('userNodeSchema.relation.length', userNodeSchema.relation.length)
             for (var j = 0; j < userNodeSchema.relation.length; j++) {
                 row = userNodeTable[i];
                 relCol = userNodeSchema.relation[j];
@@ -661,9 +475,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                     targetId = normalizedNodeTable.length - 1
                 }
                 else {
-                    // targetId = nodeIds[rowNum]
                     targetId = rowNum
-                    // targetId = nodeLabels.indexOf(row[relCol]);
                 }
 
                 // create entry in link table
@@ -671,7 +483,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                 for (var k = 0; k < colCount; k++) {
                     newLinkRow.push('');
                 }
-                // console.log('CREATE LINK', sourceId, targetId)
                 newLinkRow[normalizedLinkSchema.id] = normalizedLinkTable.length;
                 newLinkRow[normalizedLinkSchema.source] = sourceId
                 newLinkRow[normalizedLinkSchema.target] = targetId
@@ -681,11 +492,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                 normalizedLinkTable.push(newLinkRow);
             }
         }
-        // console.log('normalizedLinkTable', normalizedLinkTable)
     }
-
-
-
 
     ///////////////////////////////
     // PROCESS SINGLE LINK-TABLE //
@@ -695,7 +502,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
 
     if (currentNetwork.userNodeTable == undefined
         && currentNetwork.userLinkTable != undefined) {
-        // console.log('Create node table from scratch')
         var nodeLocations: number[][] = [];
         var nodeTimes: number[][] = [];
         var nodeTypes: string[] = [];
@@ -707,14 +513,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         var locationName: string;
         var timeString: string;
         var timeFormatted: string;
-
-        // for( var p in userLinkSchema){
-        //     if(userLinkSchema.hasOwnProperty(p)
-        //     && userLinkSchema[p] > -1)
-        //     {
-        //         normalizedLinkSchema[p] = userLinkSchema[p];
-        //     }
-        // }
 
         // Extract node labels and create (simple) normalized node table
         var row: any;
@@ -736,8 +534,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             }
         }
     }
-
-
 
     // At this point, there is a normalzied node table
     // if the user has not specified any link table, a normalized  
@@ -889,7 +685,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                         if (rowToDuplicate[normalizedNodeSchema.location] == '') {
                             rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target]
                             rowToDuplicate[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
-                            // console.log('LOCATION INFO: ', rowToDuplicate[normalizedNodeSchema.label], rowToDuplicate[normalizedNodeSchema.location], rowToDuplicate[normalizedNodeSchema.time])
                         } else {
                             // duplicate
                             var newRowNode = []
@@ -898,8 +693,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                             }
                             newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target]
                             newRowNode[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
-                            // console.log('LOCATION INFO: ', newRowNode[normalizedNodeSchema.label], rowToDuplicate[normalizedNodeSchema.location], rowToDuplicate[normalizedNodeSchema.time])
-
                             normalizedNodeTable.push(newRowNode);
                         }
                     }
@@ -910,8 +703,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             }
         } // end of checking for node times and location in link table
     } // end of link table normalization
-
-
 
     // FORMAT TIMES INTO ISO STANDARD
 
@@ -935,8 +726,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             }
         }
     }
-
-
 
     ////////////////////////////////////////////////////////////////////
     // CREATE AND NORMALIZE LOCATION TABLE IF ANY LOCATION DATA EXITS //
@@ -988,32 +777,8 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         }
     }
 
-    /// REPLACE LOCATIONS IN NODE AND LINK TABLES WITH INDICES
-    // if source and target locations are available, set to indices.
-    //source location
-    // if (userLinkSchema.source_location > -1) 
-    // {
-    //     for(var i=1 ; i<userLinkData.length ; i++)
-    //     {
-    //         locationName = userLinkData[i][userLinkSchema.source_location].trim();
-    //         id = locationLabels.indexOf(locationName);
-    //         normalizedLinkTable[i-1][normalizedLinkSchema.source_location] = id;
-    //     }
-    // }
-    // //target location
-    // if (userLinkSchema.target_location > -1) 
-    // {
-    //     for(var i=1 ; i<userLinkData.length ; i++)
-    //     {
-    //         locationName = userLinkData[i][userLinkSchema.target_location].trim();
-    //         id = locationLabels.indexOf(locationName);
-    //         normalizedLinkTable[i-1][normalizedLinkSchema.target_location] = id;
-    //     }
-    // }
-
     if (normalizedNodeSchema.location > -1) {
         for (var i = 0; i < normalizedNodeTable.length; i++) {
-            // console.log()
             locationName = normalizedNodeTable[i][normalizedNodeSchema.location].trim();
             id = locationLabels.indexOf(locationName);
             normalizedNodeTable[i][normalizedNodeSchema.location] = id;
@@ -1050,20 +815,13 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         normalizedLinkTable[i][0] = parseInt(normalizedLinkTable[i][0])
     }
 
-    // currentNetwork.networkCubeDataSet.nodeTable = normalizedNodeTable;
-    // currentNetwork.networkCubeDataSet.linkTable = normalizedLinkTable;
-    // currentNetwork.networkCubeDataSet.linkSchema = normalizedLinkSchema;
-    // currentNetwork.networkCubeDataSet.nodeSchema = normalizedNodeSchema;
-
     // save network on the vistorian side
     currentNetwork.ready = true;
     storage.saveNetwork(currentNetwork, sessionid);
 
     main.setDataManagerOptions({ keepOnlyOneSession: false });
 
-    // console.log('>> START IMPORT');
     main.importData(sessionid, dataset);
-    console.log('>> NETWORK IMPORTED: ', dataset);
 
     return dataset;
 }

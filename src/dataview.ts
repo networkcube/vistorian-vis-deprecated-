@@ -7,7 +7,6 @@ import * as main from 'vistorian-core/src/main';
 
 var DATA_TABLE_MAX_LENGTH = 200;
 
-
 var files = document.getElementById('files');
 
 if (files)
@@ -118,19 +117,12 @@ export function loadNetworkList() {
     })
 }
 
-
-
 // VISUALIZATIONS
 
 // creates a new visualization of the passed type
 export function loadVisualization(visType: any) {
-    // trace.event("system", "ts_" + visType, "CCC", "DDD");
     window.open(visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
 }
-
-
-
-
 
 // CREATE NETWORK //
 
@@ -142,10 +134,6 @@ export function createNetwork() {
     currentNetwork = new vistorian.Network(id);
     currentNetwork.name = 'Network-' + currentNetwork.id;
     storage.saveNetwork(currentNetwork, SESSION_NAME);
-    // saveCurrentNetwork(true);
-
-    // $('#chooseNetworktype').css('display', 'block')
-    // $('#networkTables').css('display', 'block')
     showNetwork(currentNetwork.id);
 
     loadNetworkList();
@@ -157,7 +145,6 @@ export function setNodeTable(list: any) {
     if (tableName != '---') {
         var table: vistorian.VTable = storage.getUserTable(tableName, SESSION_NAME);
         currentNetwork.userNodeTable = table;
-        // console.log('currentNetwork.userNodeTable', currentNetwork.userNodeTable)
         showTable(table, '#nodeTableDiv', false, currentNetwork.userNodeSchema)
     } else {
         unshowTable('#nodeTableDiv');
@@ -194,27 +181,9 @@ export function setLocationTable(list: any) {
 // saves/updates and normalizes current network.
 export function saveCurrentNetwork(failSilently: boolean) {
 
-    // console.log('Save current network')
-
-    // var networkcubeDataSet: networkcube.DataSet;
-
     saveCellChanges();
 
-    // create new network data set, if necessary
-    // if (currentNetwork.networkCubeDataSet == undefined) {
-    //     networkcubeDataSet = new networkcube.DataSet({
-    //         name: currentNetwork.name,
-    //         nodeTable: [],
-    //         linkTable: [],
-    //         locationTable: []
-    //     });
-    //     currentNetwork.networkCubeDataSet = networkcubeDataSet;
-    // } else {
-    //     networkcubeDataSet = currentNetwork.networkCubeDataSet;
-    // }
-
     currentNetwork.name = $('#networknameInput').val();
-    // currentNetwork.networkCubeDataSet.name = $('#networknameInput').val();
 
     if (currentNetwork.userNodeSchema)
         if (currentNetwork.userNodeSchema.time != -1) {
@@ -277,8 +246,6 @@ export function deleteCurrentNetwork() {
 export function showNetwork(networkId: number) {
 
     unshowNetwork();
-    // $('#noNetworkTables').css('display', 'none');
-    // console.log('networkId', networkId)
     currentNetwork = storage.getNetwork(networkId.toString(), SESSION_NAME);
 
     if (currentNetwork == null)
@@ -316,8 +283,6 @@ export function showNetwork(networkId: number) {
 
 
     tables.forEach(t => {
-        // console.log('attach: ', t.name)
-
         $('#nodetableSelect')
             .append('<option value="' + t.name + '">' + t.name + '</option>')
         $('#linktableSelect')
@@ -344,11 +309,6 @@ export function showNetwork(networkId: number) {
     $('#tileViewLink').attr('href', 'sites/tileview.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name.split(' ').join('___'))
     $('#mat-nlViewLink').attr('href', 'sites/mat-nl.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name.split(' ').join('___'))
 
-    // saveCurrentNetwork(true);
-    // storage.saveNetwork(currentNetwork);
-    // MarieBoucherTest.run(SESSION_NAME, currentNetwork.name);
-
-
     updateNetworkStatusIndication()
 
 }
@@ -369,8 +329,6 @@ export function updateNetworkStatusIndication() {
 
 // removes a displayed table from the DOM
 export function unshowNetwork() {
-    // $('#noNetworkTables').css('display', 'block');
-
     $('#nodetableSelect').empty();
     $('#linktableSelect').empty();
     $('#locationtableSelect').empty();
@@ -381,13 +339,6 @@ export function unshowNetwork() {
     $('#tileViewLink').attr('href', 'tileview.html?session=' + SESSION_NAME)
     $('#mat-nlViewLink').attr('href', 'mat-nl.html?session=' + SESSION_NAME)
 }
-
-
-
-
-
-
-
 
 // TABLES ///
 
@@ -403,8 +354,6 @@ export function showSingleTable(tableName: string) {
     showTable(currentTable, '#individualTable', false);
     $('#individualTables').css('display', 'inline');
     $('#networkTables').css('display', 'none');
-    // $('#noNetworkTables').css('display', 'none');
-
 }
 
 // displays a table into the DOM
@@ -430,8 +379,6 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
     var tableMenu = $(elementName).prev()
     tableMenu.find('.tableMenuButton').remove();
 
-    // tableDiv.append(tableMenu);
-
     var data = table.data
     if (data.length > DATA_TABLE_MAX_LENGTH) {
         var info = $('<p>Table shows first 200 rows out of ' + data.length + ' rows in total.</p>');
@@ -442,23 +389,6 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
     // export button
     var csvExportButton = $('<button class="tableMenuButton" onclick="window.exports.networkcube.dataview.exportCurrentTableCSV(\'' + table.name + '\')">Export as CSV</button>')
     tableMenu.append(csvExportButton);
-
-    // location extraction button
-    // var extractLocationCoordinatesButton
-    // if (isLocationTable) {
-    //     tableMenu.append($('<button class="tableMenuButton" onclick="updateLocations()">Update location coordinates</button>'))
-    // }else{
-    //     tableMenu.append($('<button class="tableMenuButton" onclick="extractLocations()">Extract locations</button>'))
-    // }
-
-
-    // replace function
-    // tableMenu.append('Replace <input id="replace_pattern" type="text"/> by <input type="text" id="replace_value"/><input id="replaceButton" type="button" class="tableMenuButton" onclick="replaceCellContents(\''+tableId+'\')" value="Replace"/>');
-
-
-    // table status
-    // tableMenu.append('<div id="datatable_' + table.name + '_tool" ></div>');
-    // tableMenu.append('<div id="datatable_' + table.name + '_error" ></div>');
 
     // create table
 
@@ -501,20 +431,16 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
                 }
             });
             td.focusin(function (this: any) { //????? e
-                // console.log('td.focusin');
                 saveCellChanges();
                 currentCell = $(this);
             });
             td.focusout(function (e: any) {
-                // console.log('td.focusout');
                 saveCellChanges();
             });
             if (typeof data[r][c] == 'string' && data[r][c].trim().length == 0)
                 td.addClass('emptyTableCell')
         }
     }
-    // addOption('table_select', [{'id':'datatable_' + table.id,'name':table.name}]);
-
 
     // turn table into an interactive jQuery table
     var dtable: any = ($('#' + tableId) as any).DataTable({
@@ -522,18 +448,8 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
     });
     dtable.columns.adjust().draw();
 
-    // handle cell change events and store new values in data table
-    // $('#' + tableId + ' tbody').on('click', 'td', function() {
-    //     saveCellChanges();
-    //     currentCell = $(this);
-    // });
-
-
-
     // Add schema selection to table, if a schema is passed
     if (schema) {
-
-        // console.log('Schema', schema);
 
         // add schema header
         var schemaRow = $('<tr class="schemaRow"></tr>');
@@ -609,153 +525,6 @@ export function timeFormatChanged() {
     saveCurrentNetwork(false);
 }
 
-// function showLocationTable(table:any[], elementName:string, schema:networkcube.LocationSchema){
-//     var tHead, tBody;
-//     console.log('>>>Show location table');
-
-//     $(elementName).empty();
-
-//     // table name
-//     var tableId = 'datatable_locationTable';
-//     $('#'+tableId).remove();
-
-//     var tableDiv = $('<div id="div_'+ tableId +'"></div>');
-//     $(elementName).append(tableDiv);
-
-//     var tableMenu = $('<div class="tableMenu"></div>');
-//     tableDiv.append(tableMenu);
-
-//     // tableMenu.append('<p id="datatable_locationTable_name"><b>Name:</b>Locations</p>');
-//     // var csvExportButton = $('<button class="csvExportButton" onclick="exportCurrentTableCSV()">Export as CSV</button>')
-//     // tableMenu.append(csvExportButton);
-//     // export button
-//     var csvExportButton = $('<button class="tableMenuButton" onclick="exportLocationTableCSV()">Export as CSV</button>')
-//     tableMenu.append(csvExportButton);
-
-
-//     // table status
-//     tableMenu.append('<div id="datatable_locationTable_tool" ></div>');
-//     tableMenu.append('<div id="datatable_locationTable_error" ></div>');
-
-//     // create table
-
-//     var tab = $('<table id="'+ tableId + '" style="width: 100%">');
-//     tableDiv.append(tab);
-//     tab.addClass('datatable stripe hover cell-border and order-column compact');
-
-//     // create head
-//     tHead = $('<thead>');
-//     tab.append(tHead);
-//     var tr = $('<tr></tr>').addClass('tableheader');
-//     tHead.append(tr);
-
-//     if(table[0] == undefined)
-//         return;
-
-//     // add header to table
-//     var firstRow:any[]= [-1,-1,-1,-1];
-//     for(field in schema){
-//         firstRow[schema[field]] = field;
-//     }
-
-
-//     var data = table.slice(0);
-//     data.splice(0, 0, firstRow);
-//     for (var c = 0; c < data[0].length; c++) {
-//         var td = $('<th></th>').addClass('th').attr('contenteditable', 'false');
-//         tr.append(td);
-//         td.html(data[0][c]);
-//     }
-
-//     tBody = $('<tbody></tbody>');
-//     tab.append(tBody);
-
-//     // Load data into html table
-//     for (var r = 1; r < data.length; r++) {
-//         tr = $('<tr></tr>').addClass('tablerow')
-//         tBody.append(tr);
-//         for (var c = 0; c < data[r].length; c++) {
-//             td = $('<td></td>').attr('contenteditable', 'true');
-//             tr.append(td);
-//             td.html(data[r][c])
-//             td.blur(function() {
-//                 if($(this).html().length == 0){
-//                     $(this).addClass('emptyTableCell')
-//                 }else{
-//                     $(this).removeClass('emptyTableCell')
-//                 }
-//             });
-//             if(typeof data[r][c] == 'string'  && data[r][c].trim().length == 0)
-//                 td.addClass('emptyTableCell')
-//         }
-//     }
-//     // addOption('table_select', [{'id':'datatable_' + table.id,'name':table.name}]);
-
-
-//     // turn table into an interactive jQuery table
-//     $('#' + tableId).DataTable( {
-//         "autoWidth": true
-//     } );
-
-//     // handle cell change events and store new values in data table
-//     $('#'+tableId+ ' tbody').on( 'click', 'td', function () {
-//         // if(selectedCell_row != undefined && selectedCell_col != undefined){
-//         //     var text = $('#' + tableId + ' tbody').children()[selectedCell_row].children[selectedCell_col].innerText;        
-//         //     table[selectedCell_row][selectedCell_col] = text.trim();
-//         //     console.log('Cell content replaced', table.data[selectedCell_row][selectedCell_col], text);    
-//         //     showNetwork(currentNetwork.id);
-//         // }   
-//         saveCellChanges();     
-//         selectedCell_row = $(this).parent().index();
-//         selectedCell_col = $(this).index();
-//     });
-
-//     // Add schema selection to table, if a schema is passed
-//     if(schema && table[0])
-//     {
-//         console.log('schema found')
-
-//         // add schema header
-//         var schemaRow = $('<tr class="schemaRow"></tr>');
-//         $('#' + tableId + ' > thead').append(schemaRow);
-
-//         var select, cell, option, timeFormatInput;
-
-//         for(var i=0 ; i<table[0].length ; i++){
-//             cell = $('<th class="schemaCell" id="schemaCell_'+schema.name+'_'+i+'"></th>')
-//             schemaRow.append(cell);
-//             select = $('<select onchange="schemaSelectionChanged(this.value, '+i+' , \''+ schema.name+'\')"></select>');
-//             cell.append(select);
-//             select.append('<option>---</option>')
-//             for (var field in schema) {
-//                 if(field == 'name'
-//                 || field == 'constructor'
-//                 || field == 'timeFormat')
-//                     continue;
-
-//                 option = $('<option>'+field+'</option>');
-//                 select.append(option);
-
-//                 if(i==0 && field=='id'){
-//                     $(option).attr('selected','selected');
-//                     schema[field] = 0;
-//                 }
-
-//                 if(schema[field] == i){
-//                     $(option).attr('selected','selected');
-//                     if(field == 'time'){
-//                         timeFormatInput = $('<input type="text" size="30" id="timeFormatInput_'+schema.name+'"></input>')
-//                         cell.append(timeFormatInput)
-//                         if(currentNetwork[schema.name].hasOwnProperty('timeFormat')){
-//                             timeFormatInput.val(currentNetwork[schema.name].timeFormat);
-//                         }
-//                     }                    
-//                 }
-//             }
-//         }
-//     }
-// }
-
 export function deleteCurrentTable() {
     storage.deleteTable(currentTable, SESSION_NAME);
     $('#individualTables').css('display', 'none');
@@ -776,7 +545,6 @@ export function schemaSelectionChanged(field: string, columnNumber: number, sche
             }
         } else {
             if ((currentNetwork as any)[schemaName][field2] == columnNumber) {
-                // console.log('set ', field2, 'to -1');
                 (currentNetwork as any)[schemaName][field2] = -1;
             }
         }
@@ -787,7 +555,6 @@ export function schemaSelectionChanged(field: string, columnNumber: number, sche
     } else if (field != '---') {
         (currentNetwork as any)[schemaName][field] = columnNumber;
     }
-    // console.log("currentNetwork[schemaName]", currentNetwork[schemaName])
 
     saveCurrentNetwork(false);
     showNetwork(currentNetwork.id)
@@ -796,15 +563,12 @@ export function schemaSelectionChanged(field: string, columnNumber: number, sche
 
 export function checkTimeFormatting(network: vistorian.Network) {
 
-    // console.log('checkTimeFormatting');
-
     var corruptedNodeTimes: number[] = [];
     if (network.userNodeTable && network.userNodeTable && network.userNodeSchema && (network.userNodeSchema as any)['timeFormat']) {
         corruptedNodeTimes = vistorian.checkTime(
             network.userNodeTable,
             network.userNodeSchema['time'],
             (network.userNodeSchema as any)['timeFormat']);
-        // console.log('corruptedTimes', corruptedNodeTimes);
     }
 
     var corruptedLinkTimes: number[] = [];
@@ -813,10 +577,8 @@ export function checkTimeFormatting(network: vistorian.Network) {
             network.userLinkTable,
             network.userLinkSchema['time'],
             (network.userLinkSchema as any)['timeFormat']);
-        // console.log('corruptedTimes', corruptedLinkTimes);
     }
 
-    // return corruptedNodeTimes.length > 0 || corruptedLinkTimes.length > 0;
     return false;
 }
 
@@ -839,7 +601,6 @@ export function getFileInfos(e: any) {
     var output = [];
     for (var i = 0, f; f = files[i]; i++) {
         if (f.name.split('.')[1] != 'csv') {
-            // output.push('<li style="color:#f00;"><strong>', f.name, '</strong> is not a CSV file.</li>');
             showMessage("Uploaded file is not a .csv file. Please chose another file.", 4000)
             return;
         } else {
@@ -919,24 +680,9 @@ export function exportCurrentTableCSV(tableName: string) {
     vistorian.exportTableCSV(table);
 }
 
-// function exportLocationTableCSV() {
-//     if (currentNetwork.networkCubeDataSet.locationTable) {
-//         saveCellChanges();
-//         vistorian.exportLocationTableCSV(currentNetwork.name, currentNetwork.networkCubeDataSet.locationTable);
-//     }
-// }
-
-// function displayLocationTable(){  
-// var locationTable = currentNetwork.networkCubeDataSet.locationTable;
-// if(locationTable != undefined)  
-//     showLocationTable(currentNetwork.networkCubeDataSet.locationTable, '#locationTableDiv', currentNetwork.networkCubeDataSet.locationSchema)
-// }
-
 export function replaceCellContents(tableId: any) {
     var replace_pattern = $('#div_' + tableId + ' #replace_pattern').val();
     var replace_value = $('#div_' + tableId + ' #replace_value').val();
-    // console.log('replace_pattern', replace_pattern)
-    // console.log('replace_value', replace_value)
     var arr: any;
 
     if (tableId.startsWith('datatable_'))
@@ -950,7 +696,6 @@ export function replaceCellContents(tableId: any) {
     } else {
         arr = table;
     }
-    // console.log('table', table)
 
     var replaceCount = 0
     for (var i = 0; i < arr.length; i++) {
@@ -982,7 +727,6 @@ export function replaceCellContents(tableId: any) {
 /** Extracts locations from node and link tabe**/
 export function extractLocations() {
 
-    // console.log('>>>> Extracting locations') 
     showMessage('Extracting locations...', false);
 
     if (currentNetwork.userLocationTable == undefined) {
@@ -1053,7 +797,6 @@ export function extractLocations() {
     if (locationsFound > 0)
         showMessage(locationsFound + ' locations found.', 2000);
     else {
-        // showMessage('In order to extract locations, you must specify which columns are locations in your node and link tables.', 2000);
         updateLocations();
     }
 }
@@ -1082,7 +825,6 @@ export function updateLocations() {
     if (currentNetwork.userLocationTable)
         updateLocationTable(currentNetwork.userLocationTable, currentNetwork.userLocationSchema,
             function (nothingImportant: any) {
-                // console.log('currentNetwork.userLocationTable', currentNetwork.userLocationTable.data)
                 saveCurrentNetwork(false);
                 showNetwork(currentNetwork.id);
                 showMessage('Locations updated successfully!', 2000);
@@ -1119,7 +861,6 @@ export function saveCellChanges() {
         data = currentCell.data('table').data,
         value;
 
-    // console.log('saveCellChanges', selectedCell_row, selectedCell_col);
 
     if (selectedCell_row != undefined && selectedCell_col != undefined) {
         value = currentCell.text().trim();
@@ -1130,15 +871,8 @@ export function saveCellChanges() {
 
 export function clearCache() {
     unshowNetwork();
-    // networkcube.clearAllDataManagerSessionCaches();    
-
     localStorage.clear();
-    // vistorian.clearCache();
-    // networkcube.clearAllDataManagerSessionCaches();
-
     location.reload()
-    // showMessage('Cache cleared', 2000)
-
 }
 
 export function removeNetwork(networkId: string) {
@@ -1147,8 +881,6 @@ export function removeNetwork(networkId: string) {
 }
 
 export function removeTable(tableId: string) {
-    console.log('>> REMOVE TABLE');
-
     var table = storage.getUserTable(tableId, SESSION_NAME);
     unshowTable('#individualTables')
 
@@ -1191,8 +923,6 @@ export function exportNetwork(networkId: number) {
 export function setNetworkConfig(string: string) {
 
     currentNetwork.networkConfig = string;
-
-    // $('#chooseNetworktype').css('display', 'none')
 
     storage.saveNetwork(currentNetwork, SESSION_NAME);
     loadNetworkList();
@@ -1252,7 +982,6 @@ export function updateEntryToLocationTableOSM(index: number, geoname: string, lo
                 if (geoname == '')
                     return;
                 locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-                // console.log('update', geoname, undefined, undefined);
             }
         })
         .always(function () {
@@ -1267,7 +996,6 @@ export function updateLocationTable(userLocationTable: vistorian.VTable, locatio
     requestsRunning = 0;
     fullGeoNames = [];
     for (var i = 1; i < data.length; i++) {
-        // console.log('send update request ', data[i][locationSchema.geoname])
         updateEntryToLocationTableOSM(i, data[i][locationSchema.geoname], userLocationTable, locationSchema);
     }
     // wait for all requests to be returned, until continue

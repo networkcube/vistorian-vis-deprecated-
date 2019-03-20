@@ -11,16 +11,13 @@ var SESSION_SESSIONID: string = "vistorian.lastSessionId";
 var SEP: string = "#";
 
 
-console.log(SEP);
 // SESSION
 export function saveSessionId(sessionid: string) {
-    // console.log('save session', sessionid )
     $.jStorage.set("vistorian.lastSessionId", sessionid);
 }
 
 export function getLastSessionId(): string {
     var session: string = $.jStorage.get<string>("vistorian.lastSessionId");
-    // console.log('get session, ', session)
     return session;
 }
 
@@ -32,7 +29,6 @@ export function getLastSessionId(): string {
 
 // Stores all user's tables (tables must be in json format)
 export function saveUserTable(table: any, sessionid: string) {
-    // console.log('[vistorian] Save user table', table.name, sessionid);
 
     // add name to table names if not yet there.
     var tableNames: string[] = getTableNames(sessionid);
@@ -47,14 +43,10 @@ export function saveUserTable(table: any, sessionid: string) {
         })
     }
     if (!found) {
-        // console.log('\tTable', table.name, 'not found. Table added.')
         tableNames.push(table.name);
         saveTableNames(tableNames, sessionid);
-    } else {
-        // console.log('\tTable', table.name, 'found. Replace table')
-    }
+    } 
     $.jStorage.set(sessionid + "#" + "vistorian.table" + "#" + table.name, table);
-    // console.log('\tTable', table.name, 'added.', getTableNames(sessionid).length + ' tables stored.', getUserTable(table.name, sessionid))
 
 }
 
@@ -76,7 +68,6 @@ export function getUserTable(tablename: string, sessionid: string): vistorian.VT
 
 export function getTableNames(sessionid: string): string[] {
     var names: string[] = $.jStorage.get<string[]>(sessionid + "#" + "vistorian.tablenames");
-    // console.log('>>>names',names, sessionid + SEP + SESSION_TABLENAMES )
     if (names == undefined)
         names = []
     return names;
@@ -102,12 +93,7 @@ export function deleteTable(table: vistorian.VTable, sessionid: string) {
         tableNames.splice(tableNames.indexOf(table.name), 1);
         saveTableNames(tableNames, sessionid);
     }
-    // console.log('table deleted', getTableNames(sessionid));
 }
-
-
-
-
 
 
 ////////////////
@@ -115,10 +101,8 @@ export function deleteTable(table: vistorian.VTable, sessionid: string) {
 ////////////////
 
 export function getNetworkIds(sessionid: string): number[] {
-    //var ids: number[] = [(<any>$.jStorage.get(sessionid + SEP + SESSION_NETWORKIDS)).id];
     var ids: number[] = $.jStorage.get(sessionid + "#" + "vistorian.networkIds");
 
-    console.log('getNetworkIds :', sessionid, ids)
     if (ids == undefined)
         ids = []
     return ids;
@@ -132,7 +116,6 @@ export function saveNetwork(network: vistorian.Network, sessionid: string) {
     if (!networkIds) {
         networkIds = [];
     } else {
-        console.log(networkIds);
         networkIds.forEach(networkId => {
             if (networkId == network.id) {
                 found = true;
@@ -142,9 +125,7 @@ export function saveNetwork(network: vistorian.Network, sessionid: string) {
     if (!found) {
         networkIds.push(network.id);
         saveNetworkIds(networkIds, sessionid);
-        // console.log('Save imported networkId', network.id)
     }
-    // console.log('save network', network)
     $.jStorage.set(sessionid + "#" + "vistorian.network" + "#" + network.id, network);
 
 }
@@ -158,14 +139,11 @@ export function getNetwork(networkId: string, sessionid: string): vistorian.Netw
 }
 
 export function deleteNetwork(network: vistorian.Network, sessionid: string) {
-    // console.log('deleteNetworkById', network.id, sessionid);
     main.deleteData(network.name);
     deleteNetworkById(network.id, sessionid);
 
 }
 export function deleteNetworkById(id: number, sessionid: string) {
-    // console.log('deleteNetworkById', id, sessionid);
-
     // remove network tables from local storage: 
 
     $.jStorage.set(sessionid + "#" + "vistorian.network" + "#" + id, {});
@@ -186,5 +164,4 @@ export function deleteNetworkById(id: number, sessionid: string) {
         networkIds.splice(networkIds.indexOf(id), 1);
         saveNetworkIds(networkIds, sessionid);
     }
-    // console.log('[storage] Network removed', getNetworkIds().length, 'networks remaining.');
 }

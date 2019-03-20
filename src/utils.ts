@@ -9,10 +9,3 @@ export function getUrlVars() {
     });
     return vars;
 }
-
-/** Removes white space before and after a string */
-
-// export function rtrim(s: string) {
-//     return this.replace(/((\s*\S+)*)\s*/, "$1");
-// }
-
