@@ -1,16 +1,13 @@
 const path = require('path');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
-//const webpack = require('webpack');
 
 module.exports = {
-    target: 'web',
     mode: 'development',
-    entry: './src/index.ts',
+    entry: './src/index.ts', 
     devtool: 'inline-source-map',
     externals: {
         d3: 'd3',
         science: 'science',
-        jstorage: 'jstorage',
         express: 'express'
     },
     plugins: [
@@ -23,9 +20,9 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
+                test: /\.ts|\.tsx$/,
                 use: 'ts-loader',
-                exclude: /node_modules/
+                include: __dirname
             }
         ]
     },

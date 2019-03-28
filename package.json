@@ -8,7 +8,7 @@
         "build": "tsc --pretty false && webpack --config webpack.config.js",
         "lint": "tslint -p . -e 'package.json'",
         "clean": "rimraf lib",
-        "start": "webpack-dev-server --open"
+        "prepare": "npm run build"
     },
     "author": "Benjamin Bach <benj.bach@gmail.com>",
     "license": "MIT",
@@ -16,6 +16,7 @@
         "@types/jquery": "^1.10.35",
         "@types/jstorage": "^0.3.30",
         "@types/papaparse": "^4.5.7",
+        "@types/lz-string": "^1.3.32",
         "rimraf": "^2.6.3",
         "ts-loader": "^5.3.3",
         "tslint": "^5.12.1",
@@ -34,13 +35,17 @@
         "Alexandra Ibarra Cuesta"
     ],
     "homepage": "https://github.com/networkcube/networkcube#readme",
+    "bundledDependencies": [
+        "jstorage"
+    ],
     "dependencies": {
         "circular-dependency-plugin": "^5.0.2",
         "jquery": "^3.3.1",
         "jstorage": "^0.4.8",
+        "lz-string": "^1.3.32",
         "moment": "^2.23.0",
         "papaparse": "^4.6.3",
-        "vistorian-core": "file:../vistorian-core",
-        "vistorian-widgets": "file:../vistorian-widgets"
+        "vistorian-core": "0.0.1-alpha",
+        "vistorian-widgets": "0.0.1-alpha"
     }
 }

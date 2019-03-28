@@ -282,7 +282,7 @@ export function setHeader(elementId: String, datasetname: String) {
     var vars: any = utils.getUrlVars();
 
     // VS: Clicks on Return to DataView
-    $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(\'system\', \'ts_ReturnDV\', \'CCC\', \'DDD\');" target="_blank">Return to Dataview</a>');
+    $('#' + elementId).append('<a href="../web/dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(\'system\', \'ts_ReturnDV\', \'CCC\', \'DDD\');" target="_blank">Return to Dataview</a>');
     $('#' + elementId).append('<br/><br/>');
 }
 
@@ -351,7 +351,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
 
     // get standard schemas
     // INIT NODE SCHEMA
-    var normalizedNodeSchema: datamanager.NodeSchema = new datamanager.NodeSchema(0);;
+    var normalizedNodeSchema: datamanager.NodeSchema = new datamanager.NodeSchema(0);
     
     
     // INITIALZE NORMALIZED SCHEMAS WITH USER'S ATTRIBUTES
