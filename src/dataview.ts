@@ -65,7 +65,7 @@ export function loadVisualizationList() {
     visualizations.forEach(function (v) {
         $('#visualizationList')
             .append('<li class="visLink" title="Show ' + v[0] + ' visualization.">\
-                        <button onclick="window.vs.dataview.loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip">\
+                        <button onclick="window.exports.networkcube.dataview.loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip">\
                             <img src="../static/figures/' + v[1] + '.png" class="visicon"/>\
                             <p>' + v[0] + '</p>\
                         </button>\
@@ -73,12 +73,12 @@ export function loadVisualizationList() {
     })
     $('#visualizationList')
         .append('<li class="visLink" title="Show matrix and node-link split-view.">\
-            <button onclick="window.vs.dataview.loadVisualization(\'mat-nl\')" class="visbutton hastooltip">\
+            <button onclick="window.exports.networkcube.dataview.loadVisualization(\'mat-nl\')" class="visbutton hastooltip">\
             <img src="../static/figures/nl+mat.png" class="visicon"/><p>Matrix + Node Link</p>\
         </button></li>')
     $('#visualizationList')
         .append('<li class="visLink" title="Show all visualizations.">\
-        <button onclick="window.vs.dataview.loadVisualization(\'tileview\')" class="visbutton hastooltip">\
+        <button onclick="window.exports.networkcube.dataview.loadVisualization(\'tileview\')" class="visbutton hastooltip">\
         <img src="../static/figures/all.png" class="visicon"/><p>All</p>\
         </button></li>')
 }
@@ -110,7 +110,7 @@ export function loadNetworkList() {
         network = storage.getNetwork(t, SESSION_NAME);
         $('#networkList').append('\
             <li>\
-                <a onclick="window.vs.dataview.showNetwork(\'' + network.id + '\')"  class="underlined">' + network.name + '</a>\
+                <a onclick="window.exports.networkcube.dataview.showNetwork(\'' + network.id + '\')"  class="underlined">' + network.name + '</a>\
                 <img class="controlIcon" title="Delete this network." src="../static/logos/delete.png" onclick="removeNetwork(\''+ network.id + '\')"/>\
                 <img class="controlIcon" title="Download this network in .vistorian format." src="../static/logos/download.png" onclick="exportNetwork(\''+ network.id + '\')"/>\
             </li>')
@@ -387,7 +387,7 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
 
     // CREATE TABLE MENU    
     // export button
-    var csvExportButton = $('<button class="tableMenuButton" onclick="window.vs.dataview.exportCurrentTableCSV(\'' + table.name + '\')">Export as CSV</button>')
+    var csvExportButton = $('<button class="tableMenuButton" onclick="window.exports.networkcube.dataview.exportCurrentTableCSV(\'' + table.name + '\')">Export as CSV</button>')
     tableMenu.append(csvExportButton);
 
     // create table
@@ -460,7 +460,7 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
         for (var i = 0; i < table.data[0].length; i++) {
             cell = $('<th class="schemaCell" id="schemaCell_' + schema.name + '_' + i + '"></th>')
             schemaRow.append(cell);
-            select = $('<select class="schemaSelection" onchange="window.vs.dataview.schemaSelectionChanged(this.value, ' + i + ' , \'' + schema.name + '\')"></select>');
+            select = $('<select class="schemaSelection" onchange="window.exports.networkcube.dataview.schemaSelectionChanged(this.value, ' + i + ' , \'' + schema.name + '\')"></select>');
             cell.append(select);
             select.append('<option>(Not visualized)</option>')
             for (var field in schema) {

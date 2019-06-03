@@ -15,8 +15,8 @@
     "devDependencies": {
         "@types/jquery": "^1.10.35",
         "@types/jstorage": "^0.3.30",
-        "@types/papaparse": "^4.5.7",
         "@types/lz-string": "^1.3.32",
+        "@types/papaparse": "^4.5.7",
         "rimraf": "^2.6.3",
         "ts-loader": "^5.3.3",
         "tslint": "^5.12.1",
