@@ -150,6 +150,7 @@ export function setNodeTable(list: any) {
         unshowTable('#nodeTableDiv');
         currentNetwork.userNodeTable = undefined;
     }
+    updateNetworkStatusIndication();
 }
 
 export function setLinkTable(list: any) {
@@ -162,6 +163,7 @@ export function setLinkTable(list: any) {
         unshowTable('#linkTableDiv');
         currentNetwork.userLinkTable = undefined;
     }
+    updateNetworkStatusIndication();
 }
 
 export function setLocationTable(list: any) {
@@ -319,6 +321,16 @@ export function updateNetworkStatusIndication() {
             .text('Ready for visualization. Select a visualization from the menu on the top.')
             .css('color', '#fff')
             .css('background', '#2b0')
+    }else if("userNodeTable" in currentNetwork && currentNetwork.userNodeTable && currentNetwork.userNodeTable.data.length == 1){
+        $('#networkStatus')
+            .text('Network not ready for visualization. Uploaded node table is empty.')
+            .css('background', '#f63')
+            .css('color', '#fff')
+    }else if("userLinkTable" in currentNetwork && currentNetwork.userLinkTable && currentNetwork.userLinkTable.data.length == 1){
+        $('#networkStatus')
+            .text('Network not ready for visualization. Uploaded link table is empty.')
+            .css('background', '#f63')
+            .css('color', '#fff')
     } else {
         $('#networkStatus')
             .text('Network not ready for visualization. Table or Schema specifications missing.')
@@ -611,48 +623,68 @@ export function getFileInfos(e: any) {
     uploadFiles(loadTableList);
 }
 
+//Checks if uploaded file ends in ".csv", returns boolean
+function checkFileType(filesToUpload: any){
+    if(!filesToUpload.length){
+        return false;
+    }
+    var filename = filesToUpload[0].name;
+    if(filename.substr(filename.length -4) != ".csv"){
+        $('#networkStatus')
+            .text('Incorrect format, file must be CSV.')
+            .css('background', '#f63')
+            .css('color', '#fff')
+        return false;
+    }
+    return true
+}
+
 export function uploadNodeTable(e: any) {
     filesToUpload = [e.target.files[0]];
-    uploadFiles(() => {
-        var tables = storage.getUserTables(SESSION_NAME)
-        var lastTable = tables[tables.length - 1];
+    if(checkFileType(filesToUpload)) {
+        uploadFiles(() => {
+            var tables = storage.getUserTables(SESSION_NAME)
+            var lastTable = tables[tables.length - 1];
 
-        $('#nodetableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
-        $('#nodetableSelect').val(lastTable.name);
+            $('#nodetableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
+            $('#nodetableSelect').val(lastTable.name);
 
-        setNodeTable({ value: lastTable.name })
+            setNodeTable({value: lastTable.name})
 
-        if (currentNetwork.userNodeTable)
-            showTable(currentNetwork.userNodeTable, '#nodeTableDiv', false, currentNetwork.userNodeSchema);
+            if (currentNetwork.userNodeTable)
+                showTable(currentNetwork.userNodeTable, '#nodeTableDiv', false, currentNetwork.userNodeSchema);
 
-        saveCurrentNetwork(false);
+            saveCurrentNetwork(false);
 
-        loadTableList();
+            loadTableList();
 
-    });
+        });
+    }
 
 }
 
 export function uploadLinkTable(e: any) {
     filesToUpload = [e.target.files[0]];
-    uploadFiles(() => {
-        var tables = storage.getUserTables(SESSION_NAME)
-        var lastTable = tables[tables.length - 1];
+    if(checkFileType(filesToUpload)) {
+        uploadFiles(() => {
+            var tables = storage.getUserTables(SESSION_NAME)
+            var lastTable = tables[tables.length - 1];
 
-        $('#linktableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
-        $('#linktableSelect').val(lastTable.name);
+            $('#linktableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
+            $('#linktableSelect').val(lastTable.name);
 
-        setLinkTable({ value: lastTable.name })
+            setLinkTable({value: lastTable.name})
 
-        if (currentNetwork.userLinkTable)
-            showTable(currentNetwork.userLinkTable, '#linkTableDiv', false, currentNetwork.userLinkSchema);
+            if (currentNetwork.userLinkTable)
+                showTable(currentNetwork.userLinkTable, '#linkTableDiv', false, currentNetwork.userLinkSchema);
 
-        saveCurrentNetwork(false);
+            saveCurrentNetwork(false);
 
-        var element = document.getElementById('leaveCode');
+            var element = document.getElementById('leaveCode');
 
-        loadTableList();
-    });
+            loadTableList();
+        });
+    }
 }
 
 export function uploadFiles(handler: Function) {
