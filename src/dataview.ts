@@ -359,6 +359,12 @@ export function unshowTable(elementName: string) {
     $(elementName).empty();
 }
 
+export function rowMouseOver(tableRow: any){
+    var rowID = tableRow.id - 1; //indexed from 1 in showTable function
+    var bc = new BroadcastChannel('row_hovered_over');
+    bc.postMessage({"id": rowID});
+}
+
 var currentTable: vistorian.VTable;
 
 export function showSingleTable(tableName: string) {
@@ -425,7 +431,10 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
 
     // Load data into html table
     for (var r = 1; r < Math.min(data.length, DATA_TABLE_MAX_LENGTH); r++) {
-        tr = $('<tr></tr>').addClass('tablerow')
+        tr = $('<tr></tr>').addClass('tablerow').attr({
+            'onmouseover': 'window.exports.networkcube.dataview.rowMouseOver(this)',
+            'id': r
+        });
         tBody.append(tr);
         for (var c = 0; c < data[r].length; c++) {
             td = $('<td></td>').attr('contenteditable', 'true');
