@@ -133,6 +133,7 @@ export function createNetwork() {
 
     currentNetwork = new vistorian.Network(id);
     currentNetwork.name = 'Network-' + currentNetwork.id;
+    currentNetwork.directed = false;
     storage.saveNetwork(currentNetwork, SESSION_NAME);
     showNetwork(currentNetwork.id);
 
@@ -525,8 +526,19 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
                 }
 
 
+                if(field == 'directed'){
+                    option = $('<option value='+field+' class=directionField style=display:block>' + fieldName + '</option>');
+                }
+                else if(field == 'source'){
+                    option = $('<option value='+field+' class=sourceField>' + fieldName + '</option>');
+                }
+                else if(field == 'target'){
+                    option = $('<option value='+field+' class=targetField>' + fieldName + '</option>');
+                }
+                else{
+                    option = $('<option value='+field+'>' + fieldName + '</option>');
+                }
 
-                option = $('<option value=' + field + '>' + fieldName + '</option>');
                 select.append(option);
 
                 if (i == 0 && field == 'id') {
@@ -782,6 +794,43 @@ export function replaceCellContents(tableId: any) {
     saveCellChanges();
     saveCurrentNetwork(false);
     showMessage('Replaced ' + replaceCount + ' occurrences of ' + replace_pattern + ' with ' + replace_value + '.', 2000);
+}
+
+var directedCheckboxToggle = false;
+export function directedCheckboxClick(){
+    currentNetwork.directed = true;
+    $("input[type=checkbox]").prop("checked", !directedCheckboxToggle);
+    directedCheckboxToggle = !directedCheckboxToggle;
+
+    var directionFields = document.getElementsByClassName('directionField') as HTMLCollectionOf<HTMLElement>;
+    var sourceFields = document.getElementsByClassName('sourceField');
+    var targetFields = document.getElementsByClassName('targetField');
+
+    if(directedCheckboxToggle){
+        currentNetwork.directed = true;
+        for (var i = 0; i < directionFields.length; i ++) {
+            directionFields[i].style.display = 'none';
+        }
+        for (var i = 0; i < sourceFields.length; i ++) {
+            sourceFields[i].innerHTML = 'Source Node';
+        }
+        for (var i = 0; i < targetFields.length; i ++) {
+            targetFields[i].innerHTML = 'Target Node';
+        }
+    }else{
+        currentNetwork.directed = false;
+        for (var i = 0; i < directionFields.length; i ++) {
+            directionFields[i].style.display = 'block';
+        }
+        for (var i = 0; i < sourceFields.length; i ++) {
+            sourceFields[i].innerHTML = 'Node 1';
+        }
+        for (var i = 0; i < targetFields.length; i ++) {
+            targetFields[i].innerHTML = 'Node 2';
+        }
+    }
+    saveCurrentNetwork(true);
+
 }
 
 /** Extracts locations from node and link tabe**/

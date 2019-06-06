@@ -75,6 +75,7 @@ export class VLinkSchema extends VTableSchema {
     weight: number = -1;
     time: number = -1;
     linkType: number = -1;
+    directed: number = -1;
     constructor() {
         super('userLinkSchema')
     };
@@ -106,13 +107,15 @@ export class Network {
     // networkCubeDataSet: networkcube.DataSet;
     networkConfig: string = 'both';
     timeFormat: string = '';
-    ready: boolean // placeholder indicating if network is complete and ready to be visualized.
+    ready: boolean; // placeholder indicating if network is complete and ready to be visualized.
+    directed: boolean;
 
     constructor(id: number) {
         this.id = id;
         this.userNodeSchema = new VNodeSchema();
         this.userLinkSchema = new VLinkSchema();
         this.ready = false;
+        this.directed = false;
     }
 }
 
@@ -796,6 +799,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
     params.locationTable = normalizedLocationTable;
     params.locationSchema = normalizedLocationSchema;
     params.timeFormat = currentNetwork.timeFormat;
+    params.directed = currentNetwork.directed;
     var dataset: datamanager.DataSet = new datamanager.DataSet(params);
 
     if (currentNetwork.userLocationTable) {
