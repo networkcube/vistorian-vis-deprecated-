@@ -457,10 +457,15 @@ export function showTable(table: vistorian.VTable, elementName: string, isLocati
 
         tBody.append(tr);
         for (var c = 0; c < data[r].length; c++) {
-            td = $('<td></td>').attr('contenteditable', 'true');
+            if(isLocationTable && data[0][c] == "Geoname"){
+                td = $('<td></td>').attr('contenteditable', 'false');
+            }else{
+                td = $('<td></td>').attr('contenteditable', 'true');
+            }
             td.data('row', r);
             td.data('column', c);
             td.data('table', table);
+
 
             tr.append(td);
             td.html(data[r][c])
