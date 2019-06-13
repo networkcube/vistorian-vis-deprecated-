@@ -306,6 +306,87 @@ export function importData(network: Network, session: any) {
     storage.saveNetwork(network, session);
 }
 
+export function createAndNormaliseLocationTable(currentNetwork: Network) {
+////////////////////////////////////////////////////////////////////
+    // CREATE AND NORMALIZE LOCATION TABLE IF ANY LOCATION DATA EXITS //
+    ////////////////////////////////////////////////////////////////////
+
+    //  EXTRACT LOCATIONS FROM USER LOCATION TABLE, IF PRESENT
+
+    var locationLabels: string[] = [];
+    if (currentNetwork.userLocationTable) {
+        // store all locations for easy index lookup
+        for (var i = 1; i < currentNetwork.userLocationTable.data.length; i++) {
+            locationLabels.push(currentNetwork.userLocationTable.data[i][currentNetwork.userLocationSchema.label]);
+        }
+    }
+
+    // @ts-ignore
+    var userLinkData: any = currentNetwork.userLinkTable.data;
+    if (currentNetwork.userLinkSchema) {
+        var userLinkSchema: VLinkSchema = currentNetwork.userLinkSchema;
+    } else {
+        var userLinkSchema: VLinkSchema = new VLinkSchema();
+    }
+
+    for (var i = 1; i < userLinkData.length; i++) {
+        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_source]) == -1) {
+            locationLabels.push(userLinkData[i][userLinkSchema.location_source])
+        }
+        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1) {
+            locationLabels.push(userLinkData[i][userLinkSchema.location_target])
+        }
+    }
+
+
+    var normalizedLocationSchema: datamanager.LocationSchema = datamanager.getDefaultLocationSchema();
+    if (currentNetwork.userLocationTable) {
+        normalizedLocationSchema = currentNetwork.userLocationSchema
+    }
+
+    var normalizedLocationTable: any[] = [];
+    var locationName: string = "";
+    var row: any;
+
+    // If the user has specified a location table, normalize
+    // that table:
+    if (currentNetwork.userLocationTable) {
+        var userLocationTable: any = currentNetwork.userLocationTable.data;
+        var userLocationSchema: any = currentNetwork.userLocationSchema;
+        for (var i = 1; i < userLocationTable.length; i++) {
+            row = [normalizedLocationTable.length, 0, 0, 0, 0]
+            locationName = userLocationTable[i][userLocationSchema.label]
+            row[normalizedLocationSchema.id] = locationLabels.indexOf(locationName)
+            row[normalizedLocationSchema.label] = locationName;
+            row[normalizedLocationSchema.geoname] = userLocationTable[i][userLocationSchema.geoname];
+            row[normalizedLocationSchema.latitude] = userLocationTable[i][userLocationSchema.latitude];
+            row[normalizedLocationSchema.longitude] = userLocationTable[i][userLocationSchema.longitude];
+            normalizedLocationTable.push(row)
+        }
+    }
+    // if there exist any locations, check if they are
+    // listed in the location table
+    if (locationLabels.length > 0) {
+        for (var i = 0; i < locationLabels.length; i++) {
+            var found: boolean = false;
+            for (var j = 0; j < normalizedLocationTable.length; j++) {
+                if (normalizedLocationTable[j][1] == locationLabels[i]) {
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                row = [normalizedLocationTable.length, 0, 0, 0, 0]
+                locationName = locationLabels[i]
+                row[normalizedLocationSchema.label] = locationName;
+                row[normalizedLocationSchema.geoname] = locationName;
+                normalizedLocationTable.push(row)
+            }
+        }
+    }
+    return {normalizedLocationSchema, normalizedLocationTable, locationName, locationLabels};
+}
+
 export function importIntoNetworkcube(currentNetwork: Network, sessionid: string, s: boolean) {
     currentNetwork.ready = false;
 
@@ -400,16 +481,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             }
         }
 
-    }
-
-    //  EXTRACT LOCATIONS FROM USER LOCATION TABLE, IF PRESENT
-
-    var locationLabels: string[] = [];
-    if (currentNetwork.userLocationTable) {
-        // store all locations for easy index lookup
-        for (var i = 1; i < currentNetwork.userLocationTable.data.length; i++) {
-            locationLabels.push(currentNetwork.userLocationTable.data[i][currentNetwork.userLocationSchema.label]);
-        }
     }
 
 
@@ -646,9 +717,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                             normalizedNodeTable.push(newRowNode);
                         }
                     }
-                    if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_source]) == -1) {
-                        locationLabels.push(userLinkData[i][userLinkSchema.location_source])
-                    }
                 }
 
                 // do for target location
@@ -699,9 +767,6 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
                             normalizedNodeTable.push(newRowNode);
                         }
                     }
-                    if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1) {
-                        locationLabels.push(userLinkData[i][userLinkSchema.location_target])
-                    }
                 }
             }
         } // end of checking for node times and location in link table
@@ -730,55 +795,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         }
     }
 
-    ////////////////////////////////////////////////////////////////////
-    // CREATE AND NORMALIZE LOCATION TABLE IF ANY LOCATION DATA EXITS //
-    ////////////////////////////////////////////////////////////////////
-
-    var normalizedLocationSchema: datamanager.LocationSchema = datamanager.getDefaultLocationSchema();
-    if (currentNetwork.userLocationTable) {
-        normalizedLocationSchema = currentNetwork.userLocationSchema
-    }
-
-    var normalizedLocationTable: any[] = [];
-    var locationName: string;
-    var row: any;
-
-    // If the user has specified a location table, normalize
-    // that table:
-    if (currentNetwork.userLocationTable) {
-        var userLocationTable: any = currentNetwork.userLocationTable.data;
-        var userLocationSchema: any = currentNetwork.userLocationSchema;
-        for (var i = 1; i < userLocationTable.length; i++) {
-            row = [normalizedLocationTable.length, 0, 0, 0, 0]
-            locationName = userLocationTable[i][userLocationSchema.label]
-            row[normalizedLocationSchema.id] = locationLabels.indexOf(locationName)
-            row[normalizedLocationSchema.label] = locationName;
-            row[normalizedLocationSchema.geoname] = userLocationTable[i][userLocationSchema.geoname];
-            row[normalizedLocationSchema.latitude] = userLocationTable[i][userLocationSchema.latitude];
-            row[normalizedLocationSchema.longitude] = userLocationTable[i][userLocationSchema.longitude];
-            normalizedLocationTable.push(row)
-        }
-    }
-    // if there exist any locations, check if they are 
-    // listed in the location table
-    if (locationLabels.length > 0) {
-        for (var i = 0; i < locationLabels.length; i++) {
-            var found: boolean = false;
-            for (var j = 0; j < normalizedLocationTable.length; j++) {
-                if (normalizedLocationTable[j][1] == locationLabels[i]) {
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                row = [normalizedLocationTable.length, 0, 0, 0, 0]
-                locationName = locationLabels[i]
-                row[normalizedLocationSchema.label] = locationName;
-                row[normalizedLocationSchema.geoname] = locationName;
-                normalizedLocationTable.push(row)
-            }
-        }
-    }
+    var {normalizedLocationSchema, normalizedLocationTable, locationName, locationLabels} = createAndNormaliseLocationTable(currentNetwork);
 
     if (normalizedNodeSchema.location > -1) {
         for (var i = 0; i < normalizedNodeTable.length; i++) {

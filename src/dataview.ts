@@ -213,13 +213,13 @@ export function saveCurrentNetwork(failSilently: boolean) {
 
     updateNetworkStatusIndication();
 
-    // check if locations have been extracted:
-    if (dataset
-        && !currentNetwork.userLocationTable && dataset.locationTable && dataset.locationTable.length > 0) {
-        currentNetwork.userLocationTable = new vistorian.VTable('userLocationTable', dataset.locationTable);
+    var {normalizedLocationSchema, normalizedLocationTable, locationName, locationLabels} = vistorian.createAndNormaliseLocationTable(currentNetwork)
+
+    if (!currentNetwork.userLocationTable && normalizedLocationTable.length > 2) {
+        currentNetwork.userLocationTable = new vistorian.VTable('userLocationTable', normalizedLocationTable);
         // set header
         currentNetwork.userLocationTable.data.splice(0, 0, ['Id', 'User Name', 'Geoname', 'Longitude', 'Latitude'])
-        currentNetwork.userLocationSchema = dataset.locationSchema;
+        currentNetwork.userLocationSchema = normalizedLocationSchema;
         storage.saveUserTable(currentNetwork.userLocationTable, SESSION_NAME);
         showTable(currentNetwork.userLocationTable, '#locationTableDiv', true, currentNetwork.userLocationSchema)
         $('#locationtableSelect')
@@ -873,6 +873,7 @@ export function extractLocations() {
             if (linkTable != undefined) {
                 // check if location table exists
                 for (var i = 1; i < linkTable.length; i++) {
+                    // @ts-ignore
                     createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.location_target], locationTable.data)
                 }
             }
@@ -904,6 +905,10 @@ export function extractLocations() {
         }
 
     locationsFound = locationTable.data.length;
+
+    loadTableList();
+    storage.saveNetwork(currentNetwork, SESSION_NAME);
+
 
     saveCurrentNetwork(false);
     showNetwork(currentNetwork.id);
