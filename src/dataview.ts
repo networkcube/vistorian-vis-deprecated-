@@ -4,6 +4,7 @@ import * as utils from './utils';
 
 import * as datamanager from 'vistorian-core/src/datamanager';
 import * as main from 'vistorian-core/src/main';
+var parseString = require('xml2js').parseString;
 
 var DATA_TABLE_MAX_LENGTH = 200;
 
@@ -1064,6 +1065,133 @@ export function checkRequests(callBack: any, locationsFound: any) {
     }
 }
 
+// [bbach]: function deprecated since switched to open-street-map webservice.
+export function updateEntryToLocationTableDariah(index: number, geoname: string, locationTable: vistorian.VTable, locationSchema: datamanager.LocationSchema) {
+    if(geoname) {
+        geoname = geoname.trim();
+        fullGeoNames.push(geoname);
+        // get coordinates for name:
+        console.log('url', "http://ref.dariah.eu/tgnsearch/tgnquery2.xql?ac=" + geoname.split(',')[0].trim())
+        var xhr = ($.ajax({
+            url: "http://ref.dariah.eu/tgnsearch/tgnquery2.xql?ac=" + geoname.split(',')[0].trim(),
+            dataType: 'xml',
+            headers: {
+                "accept": "application/json",
+                "Access-Control-Allow-Origin":"*"
+            },
+        }) as any)
+            .done(function (data: any, text: any, XMLHttpRequest: any) {
+                // tslint:disable-next-line:no-console
+                console.log("test - 123")
+                // tslint:disable-next-line:no-console
+                console.log(data)
+                var parsed;
+                parseString(data, function (err: any, result: any) {
+                    parsed = result;
+                });
+                data = parsed;
+                var entry;
+                var length;
+                var rowIndex = XMLHttpRequest.uniqueId + 1;
+
+                var userLocationLabel = locationTable.data[rowIndex][locationSchema.label];
+                // tslint:disable-next-line:no-console
+                console.log(data)
+                // tslint:disable-next-line:no-console
+                console.log("inital checks")
+                if (data && data.response.term != undefined) {
+                    // tslint:disable-next-line:no-console
+                    console.log("inner checks")
+                    // tslint:disable-next-line:no-console
+                    console.log(data)
+
+                    // get all results
+                    var validResults = []
+                    var result;
+
+                    // console.log('data.response.term',data.response.term)
+                    if (data.response.term[0] != undefined) {
+                        for (var i = 0; i < data.response.term.length; i++) {
+                            entry = data.response.term[i];
+                            if (entry == undefined)
+                                continue;
+                            if (entry.longitude != undefined
+                                && entry.latitude != undefined
+                                && typeof entry.longitude == 'string'
+                                && typeof entry.latitude == 'string'
+                            ) {
+                                validResults.push(entry);
+                            }
+                        }
+                    } else {
+                        validResults.push(data.response.term);
+                    }
+                    // tslint:disable-next-line:no-console
+                    console.log(validResults)
+
+                    // if no results returned, save the user location name and return;
+                    if (validResults.length == 0) {                    // no value
+                        locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
+                        return;
+                    }
+
+
+                    if (validResults.length == 1) {
+                        // if only one valid result has been returned, add this single result
+                        // locationTable.data.push([locationTable.data.length-1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude])
+                        locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude];
+                        return;
+                    } else {
+                        // look for specification in the user input that matches the geographical hiearachy of the result
+                        console.log('multiple results found')
+                        // trim user specifications
+                        var geonameAttributes = fullGeoNames[rowIndex - 1];
+                        geonameAttributes = geonameAttributes.split(',');
+                        for (var j = 0; j < geonameAttributes.length; j++) {
+                            geonameAttributes[j] = geonameAttributes[j].trim();
+                        }
+
+                        var regionTerms;
+                        // look for every valid result
+                        for (var i = 0; i < validResults.length; i++) {
+                            regionTerms = validResults[i].path.split('|');
+
+                            // trim result terms
+                            for (var j = 0; j < regionTerms.length; j++) {
+                                regionTerms[j] = regionTerms[j].trim();
+                            }
+
+                            // do terms match?
+                            if (geonameAttributes.length > 1 && regionTerms.length > 1) {
+                                for (var j = 1; j < geonameAttributes.length; j++) {
+                                    for (var k = 1; k < regionTerms.length; k++) {
+                                        if (geonameAttributes[j] == regionTerms[k]) {
+                                            locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[i].longitude, validResults[i].latitude];
+                                            console.log('update', geoname, validResults[i].longitude, validResults[i].latitude);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude];
+                        console.log('update', geoname, validResults[0].longitude, validResults[0].latitude);
+                    }
+                } else {
+                    // if answer is valid, means that webservice didn't find that name.
+                    if (geoname == '')
+                        return;
+                    locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
+                    console.log('update', geoname, undefined, undefined);
+                }
+            })
+            .always(function () {
+                requestsRunning--;
+            });
+        xhr['uniqueId'] = requestsRunning++;
+    }
+}
+
 export function updateEntryToLocationTableOSM(index: number, geoname: string, locationTable: vistorian.VTable, locationSchema: datamanager.LocationSchema) {
     geoname = geoname.trim();
     fullGeoNames.push(geoname);
@@ -1115,7 +1243,7 @@ export function updateLocationTable(userLocationTable: vistorian.VTable, locatio
     requestsRunning = 0;
     fullGeoNames = [];
     for (var i = 1; i < data.length; i++) {
-        updateEntryToLocationTableOSM(i, data[i][locationSchema.geoname], userLocationTable, locationSchema);
+        updateEntryToLocationTableDariah(i, data[i][locationSchema.geoname], userLocationTable, locationSchema);
     }
     // wait for all requests to be returned, until continue
     requestTimer = setInterval(function () {

@@ -46,6 +46,9 @@
         "moment": "^2.23.0",
         "papaparse": "^4.6.3",
         "vistorian-core": "latest",
-        "vistorian-widgets": "latest"
+        "vistorian-widgets": "latest",
+        "x2js": "^3.3.0",
+        "xml-js": "^1.6.11",
+        "xml2js": "^0.4.19"
     }
 }
