@@ -1065,48 +1065,51 @@ export function checkRequests(callBack: any, locationsFound: any) {
 }
 
 export function updateEntryToLocationTableOSM(index: number, geoname: string, locationTable: vistorian.VTable, locationSchema: datamanager.LocationSchema) {
-    geoname = geoname.trim();
-    fullGeoNames.push(geoname);
-    var xhr: any = $.ajax({
-        url: "https://nominatim.openstreetmap.org/search",
-        data: { format: "json", limit: "1", q: geoname.split(',')[0].trim() },
-        dataType: 'json'
-    })
-        .done(function (data: any, text: any, XMLHttpRequest: any) {
-            var entry: any;
-            var length: any;
-            var rowIndex: number = XMLHttpRequest.uniqueId + 1;
-            var userLocationLabel: any = locationTable.data[rowIndex][locationSchema.label];
-            if (data.length != 0) {
-                var validResults: any[] = [];
-                var result: any;
-                for (var i = 0; i < data.length; i++) {
-                    entry = data[i];
-                    if (entry == undefined)
-                        continue;
-                    if ('lon' in entry &&
-                        'lat' in entry &&
-                        typeof entry.lon === 'string' &&
-                        typeof entry.lat === 'string') {
-                        validResults.push(entry);
-                    }
-                }
-                if (validResults.length == 0) {
-                    locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-                    return;
-                }
-                locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].lon, validResults[0].lat];
-            }
-            else {
-                if (geoname == '')
-                    return;
-                locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-            }
+    if(geoname) {
+        geoname = geoname.trim();
+        fullGeoNames.push(geoname);
+        var xhr: any = $.ajax({
+            url: "https://nominatim.openstreetmap.org/search",
+            data: {format: "json", limit: "1", q: geoname.split(',')[0].trim()},
+            dataType: 'json'
         })
-        .always(function () {
-            requestsRunning--;
-        });
-    xhr['uniqueId'] = requestsRunning++;
+            .done(function (data: any, text: any, XMLHttpRequest: any) {
+                var entry: any;
+                var length: any;
+                var rowIndex: number = XMLHttpRequest.uniqueId + 1;
+                var userLocationLabel: any = locationTable.data[rowIndex][locationSchema.label];
+                if (data.length != 0) {
+                    var validResults: any[] = [];
+                    var result: any;
+                    for (var i = 0; i < data.length; i++) {
+                        entry = data[i];
+                        if (entry == undefined)
+                            continue;
+                        if ('lon' in entry &&
+                            'lat' in entry &&
+                            typeof entry.lon === 'string' &&
+                            typeof entry.lat === 'string') {
+                            validResults.push(entry);
+                        }
+                    }
+                    if (validResults.length == 0) {
+                        locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
+                        return;
+                    }
+                    locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].lon, validResults[0].lat];
+                } else {
+                    if (geoname == '')
+                        return;
+                    locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
+                }
+            })
+            .always(function () {
+                requestsRunning--;
+            });
+        xhr['uniqueId'] = requestsRunning++;
+    }else{
+        requestsRunning++;
+    }
 }
 
 export function updateLocationTable(userLocationTable: vistorian.VTable, locationSchema: datamanager.LocationSchema, callBack: Function) {
