@@ -165,6 +165,7 @@ export function setLinkTable(list: any) {
         currentNetwork.userLinkTable = undefined;
     }
     updateNetworkStatusIndication();
+    saveCurrentNetwork(false);
 }
 
 export function setLocationTable(list: any) {
