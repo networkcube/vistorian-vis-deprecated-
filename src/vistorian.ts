@@ -61,6 +61,8 @@ export class VNodeSchema extends VTableSchema {
     label: number = -1;
     time: number = -1;
     nodeType: number = -1;
+    color: number = -1;
+    shape: number = -1;
     constructor() {
         super('userNodeSchema')
     };
@@ -321,20 +323,22 @@ export function createAndNormaliseLocationTable(currentNetwork: Network) {
         }
     }
 
-    // @ts-ignore
-    var userLinkData: any = currentNetwork.userLinkTable.data;
-    if (currentNetwork.userLinkSchema) {
-        var userLinkSchema: VLinkSchema = currentNetwork.userLinkSchema;
-    } else {
-        var userLinkSchema: VLinkSchema = new VLinkSchema();
-    }
-
-    for (var i = 1; i < userLinkData.length; i++) {
-        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_source]) == -1) {
-            locationLabels.push(userLinkData[i][userLinkSchema.location_source])
+    if(currentNetwork.userLinkTable) {
+        // @ts-ignore
+        var userLinkData: any = currentNetwork.userLinkTable.data;
+        if (currentNetwork.userLinkSchema) {
+            var userLinkSchema: VLinkSchema = currentNetwork.userLinkSchema;
+        } else {
+            var userLinkSchema: VLinkSchema = new VLinkSchema();
         }
-        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1) {
-            locationLabels.push(userLinkData[i][userLinkSchema.location_target])
+
+        for (var i = 1; i < userLinkData.length; i++) {
+            if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_source]) == -1) {
+                locationLabels.push(userLinkData[i][userLinkSchema.location_source])
+            }
+            if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1) {
+                locationLabels.push(userLinkData[i][userLinkSchema.location_target])
+            }
         }
     }
 
@@ -509,11 +513,13 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         var nodeLabels: any = []
         var nodeIds: any = []
         for (var i = 1; i < userNodeTable.length; i++) {
-            newRow = [0, 0];
+            newRow = [0, 0, 0, 0];
             id = parseInt(userNodeTable[i][userNodeSchema.id]);
             nodeIds.push(id)
             newRow[normalizedNodeSchema.id] = id
             newRow[normalizedNodeSchema.label] = userNodeTable[i][userNodeSchema.label]
+            newRow[normalizedNodeSchema.color] = userNodeTable[i][userNodeSchema.color]
+            newRow[normalizedNodeSchema.shape] = userNodeTable[i][userNodeSchema.shape]
             nodeLabels.push(userNodeTable[i][userNodeSchema.label])
             normalizedNodeTable.push(newRow);
         }
