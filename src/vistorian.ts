@@ -518,8 +518,8 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             nodeIds.push(id)
             newRow[normalizedNodeSchema.id] = id
             newRow[normalizedNodeSchema.label] = userNodeTable[i][userNodeSchema.label]
-            newRow[normalizedNodeSchema.color] = userNodeTable[i][userNodeSchema.color]
             newRow[normalizedNodeSchema.shape] = userNodeTable[i][userNodeSchema.shape]
+            newRow[normalizedNodeSchema.color] = userNodeTable[i][userNodeSchema.color]
             nodeLabels.push(userNodeTable[i][userNodeSchema.label])
             normalizedNodeTable.push(newRow);
         }
