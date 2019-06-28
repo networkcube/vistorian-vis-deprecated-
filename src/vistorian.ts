@@ -456,7 +456,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
             && p != 'id'
             && p != 'label'
             && p != 'relation'
-            && (currentNetwork.userNodeSchema as any)[p].length > 0
+            && (currentNetwork.userNodeSchema as any)[p] > 0
             ) {
                 (normalizedNodeSchema as any)[p] = nodeColCount++;
             }
@@ -513,7 +513,7 @@ export function importIntoNetworkcube(currentNetwork: Network, sessionid: string
         var nodeLabels: any = []
         var nodeIds: any = []
         for (var i = 1; i < userNodeTable.length; i++) {
-            newRow = [0, 0, 0, 0];
+            newRow = [0, 0, 0, 0, 0];
             id = parseInt(userNodeTable[i][userNodeSchema.id]);
             nodeIds.push(id)
             newRow[normalizedNodeSchema.id] = id
